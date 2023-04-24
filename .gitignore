@@ -15,3 +15,5 @@ build
 .ccls
 **/venv/
 .vscode/
+**/_build/
+**/doxygen_out/

@@ -1,0 +1,83 @@
+name: 'Docs'
+
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:  # Remove this before merge
+    types:
+      - opened
+    branches:
+      - 'main'
+
+
+jobs:
+  makedocs:
+    name: 'Generate Documentation'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: python3 python3-pip doxygen make
+
+      - name: Install docs pip packages
+        run: |
+          pip3 install -r docs/requirements.txt
+
+      - name: Generate Doxygen XML
+        run: |
+          doxygen Doxyfile
+
+      - name: Generate Sphinx HTML
+        run: |
+          cd docs
+          make html
+          cd ..
+
+      - name: Archive artifact
+        shell: sh
+        if: runner.os == 'Linux'
+        run: |
+          chmod -c -R +rX "$INPUT_PATH" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+          tar \
+            --dereference --hard-dereference \
+            --directory "$INPUT_PATH" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+        env:
+          INPUT_PATH: docs/_build/html
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Docs
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: ${{ inputs.retention-days }}
+          if-no-files-found: error
+        
+  deploydocs:
+    needs: makedocs
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
