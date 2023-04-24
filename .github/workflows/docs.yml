@@ -5,11 +5,7 @@ on:
   push:
     branches:
       - 'main'
-  pull_request:  # Remove this before merge
-    types:
-      - opened
-    branches:
-      - 'main'
+      - 'docs'  # Remove
 
 
 jobs:
@@ -23,7 +19,7 @@ jobs:
 
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: python3 python3-pip doxygen make
+          packages: python3 python3-pip doxygen build-essential make
 
       - name: Install docs pip packages
         run: |
@@ -65,7 +61,7 @@ jobs:
           if-no-files-found: error
         
   deploy-docs:
-    needs: makedocs
+    needs: make-docs
     permissions:
       pages: write
       id-token: write
