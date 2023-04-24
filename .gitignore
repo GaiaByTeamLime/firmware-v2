@@ -12,6 +12,5 @@ _deps
 sdkconfig
 sdkconfig.old
 build
-.vscode/
 .ccls
 **/venv/
