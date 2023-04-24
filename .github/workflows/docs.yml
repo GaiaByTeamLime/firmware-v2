@@ -29,9 +29,11 @@ jobs:
         run: |
           doxygen Doxyfile
 
-      - uses: ammaraskar/sphinx-action@0.4
-        with:
-          docs-folder: "docs/"
+      - name: Generate Sphinx HTML
+        run: |
+          cd docs
+          make html
+          cd ..
 
       - name: Archive artifact
         shell: sh
