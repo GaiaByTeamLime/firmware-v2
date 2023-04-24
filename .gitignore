@@ -14,3 +14,4 @@ sdkconfig.old
 build
 .vscode/
 .ccls
+**/venv/
