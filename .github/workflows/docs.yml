@@ -59,8 +59,9 @@ jobs:
           path: ${{ runner.temp }}/artifact.tar
           retention-days: ${{ inputs.retention-days }}
           if-no-files-found: error
-        
+
   deploy-docs:
+    name: 'Deploy Documentation'
     needs: make-docs
     permissions:
       pages: write
@@ -76,4 +77,3 @@ jobs:
       - name: Deploy to Github Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
