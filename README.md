@@ -1,8 +1,8 @@
 # Gaia Plant Sensor Firmware V2
 This repro maintains the 2nd firmware version for the Gaia plant sensor.
 
-## Filestructure
-Below you could see an example filestructure this project holds.
+## File structure
+Below you could see an example file structure this project holds.
 
 Files with several words in the name are written with `snake_case`. For example: `persistent_storage.h`
 
