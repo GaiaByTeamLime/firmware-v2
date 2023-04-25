@@ -7,7 +7,7 @@ Below you could see an example filestructure this project holds.
 Files with several words in the name are written with `camel_case`. For example: `persistent_storage.h`
 
 ```
-src
+main
  +- persistent_storage
  |    +- persistent_storage.c
  |    +- persistent_storage.h
