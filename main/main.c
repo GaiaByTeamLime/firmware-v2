@@ -1,20 +1,11 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
+#include "prelude.h"
+
 #include "esp_system.h"
 #include "esp_adc/adc_oneshot.h"
 //#include "esp_adc/adc_continuous.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 #include "sdkconfig.h"
-#include <stdio.h>
-
-#ifdef DEBUG
-#define LOG(format, ...) \
-	ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, __func__, format, __VA_ARGS__)
-#else
-#define LOG(format, ...) /* */
-#endif
 
 adc_oneshot_unit_handle_t adc1_handle;
 
