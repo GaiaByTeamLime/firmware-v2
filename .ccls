@@ -33,3 +33,4 @@ gcc
 -I/opt/esp-idf/components/lwip/include
 -I/opt/esp-idf/components/lwip/include/apps
 -I/opt/esp-idf/components/lwip/include/apps/sntp
+-I/opt/esp-idf/components/esp_wifi/include
