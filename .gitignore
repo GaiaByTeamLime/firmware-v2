@@ -4,6 +4,7 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+!docs/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -15,3 +16,5 @@ build
 .ccls
 **/venv/
 .vscode/
+**/_build/
+**/doxygen_out/
