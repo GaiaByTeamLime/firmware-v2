@@ -1,0 +1,25 @@
+name: 'Code QA'
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+
+jobs:
+  clang-format:
+    name: 'Lint with clang-format'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run clang-format
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: '13'
+          check-path: 'main'
