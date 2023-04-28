@@ -74,6 +74,7 @@ jobs:
 
       - name: Extract artifacts
         run: |
+          ls -la
           mkdir -p ./docs_html
           tar -xvf Docs.tar --directory ./docs_html
 
