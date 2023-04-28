@@ -1,18 +1,21 @@
-#ifndef ADC_H_
-#define ADC_H_
+#ifndef __ADC_HEADER__
+#define __ADC_HEADER__
 
 #include <esp_err.h>
 
 #define ADC1_PORTS 1
 
-struct ADC_data
-{
-	esp_err_t messageResult[ADC1_PORTS];
-	int data[ADC1_PORTS]; //ldr //can be uint16_t, but create warnings
-};
+typedef struct {
+	esp_err_t messageResult;
+	uint32_t data;
+} adc_data_t;
+
+typedef enum {
+	ADC1_LDR = 0,
+} adc1_port_t;
 
 esp_err_t adc_init(void);
+void pull_latest_data();
+esp_err_t get_adc_data(adc1_port_t port, uint32_t* data);
 
-struct ADC_data getData(void);
-
-#endif
+#endif //__ADC_HEADER__

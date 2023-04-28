@@ -4,8 +4,6 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_system.h>
-#include <sdkconfig.h>
 
 void app_main(void) {
 	int index = 0;
@@ -15,17 +13,17 @@ void app_main(void) {
 	{
 		while (1)
 		{
-			LOG("ADC1 Init Error: %s", esp_err_to_name(message));
+			LOG("ADC1 Init Error");
 		}
 	}
 
 	while (1) {
-		struct ADC_data data = getData();
-		if (data.messageResult[0] != ESP_OK)
+		pull_latest_data();
+		uint32_t adc_data;
+		message = get_adc_data(ADC1_LDR, &adc_data);
+		if (message == ESP_OK)
 		{
-			LOG("ADC1 Get Data Error: %s", esp_err_to_name(data.messageResult[0]));
-		} else {
-		    LOG("LDR Data: %d", data.data[0]);
+			LOG("LDR Data: %lu", adc_data);
 		}
 		LOG("Test! %d", index++);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);

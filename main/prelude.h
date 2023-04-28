@@ -2,7 +2,7 @@
 #ifndef __PRELUDE_HEADER__
 #define __PRELUDE_HEADER__
 
-#include "esp_log.h"
+#include <esp_log.h>
 
 // This is kind of reduntent, as the ESP already has log levels internally
 // Though those are runtime checks, this is removed during compile time
