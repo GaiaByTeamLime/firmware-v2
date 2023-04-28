@@ -74,18 +74,15 @@ jobs:
 
       - name: Extract artifacts
         run: |
-          mkdir -p ./$DOCS_HTML_FOLDER
-          tar -xvf Docs.tar --directory ./$DOCS_HTML_FOLDER
+          mkdir -p ./docs_html
+          tar -xvf Docs.tar --directory ./docs_html
 
       - name: Upload
         uses: nogsantos/scp-deploy@v1.3.0
         with:
-          src: ./$DOCS_HTML_FOLDER
+          src: ./docs_html
           host: ${{ secrets.SSH_HOST }}
           remote: /var/www/html/
           port: ${{ secrets.SSH_PORT }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-
-      env:
-        DOCS_HTML_FOLDER: docs_html
