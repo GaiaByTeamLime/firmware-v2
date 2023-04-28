@@ -12,7 +12,7 @@
 #define LOG(...) ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, __func__, __VA_ARGS__)
 #define ELOG(...) ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, __func__, __VA_ARGS__)
 #else
-#define LOG(...) /* */
+#define LOG(...)  /* */
 #define ELOG(...) /* */
 #endif
 
