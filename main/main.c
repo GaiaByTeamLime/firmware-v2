@@ -21,9 +21,9 @@ void app_main(void) {
 
 	while (1) {
 		struct ADC_data data = getData();
-		if (data.messageResult != ESP_OK)
+		if (data.messageResult[0] != ESP_OK)
 		{
-			LOG("ADC1 Get Data Error: %s", esp_err_to_name(data.messageResult));
+			LOG("ADC1 Get Data Error: %s", esp_err_to_name(data.messageResult[0]));
 		} else {
 		    LOG("LDR Data: %d", data.data[0]);
 		}

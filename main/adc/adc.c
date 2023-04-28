@@ -20,20 +20,13 @@ adc_oneshot_unit_handle_t adc1_handle;
 
 esp_err_t adc_init(void)
 {
-	esp_err_t message;
-
 	//-------------ADC1 Init---------------//
     adc_oneshot_unit_init_cfg_t init_config1 = {
         .unit_id = ADC1_UNIT,
 		.ulp_mode = ADC1_ULP_MODE, //sets if the ADC will be working under super low power mode (now disabled)
     };
-	
-    message = adc_oneshot_new_unit(&init_config1, &adc1_handle);
 
-	if (message != ESP_OK)
-	{
-		return message;
-	}
+	PASS_ERROR(adc_oneshot_new_unit(&init_config1, &adc1_handle), "ADC1 init failed");
 	
     //-------------ADC1 Config---------------//
     adc_oneshot_chan_cfg_t config = {
@@ -43,12 +36,7 @@ esp_err_t adc_init(void)
 
 	for (uint8_t i = 0; i < ADC1_PORTS; i++)
 	{
-		message = adc_oneshot_config_channel(adc1_handle, i, &config);
-
-		if (message != ESP_OK)
-		{
-			return message;
-		}
+		PASS_ERROR(adc_oneshot_config_channel(adc1_handle, i, &config), "ADC1 channel config failed");
 	}
 
 	//-------------ADC1 Calibration Init---------------//
@@ -67,7 +55,7 @@ struct ADC_data getData(void) { //aanpassen
 	struct ADC_data data;
 	for (uint8_t i = 0; i < ADC1_PORTS; i++)
 	{
-		data.messageResult = adc_oneshot_read(adc1_handle, i, &data.data[i]);//recommendend, doesn't work in an ISR context (instead, use the function adc_oneshot_read_isr())
+		data.messageResult[i] = adc_oneshot_read(adc1_handle, i, &data.data[i]);//recommendend, doesn't work in an ISR context (instead, use the function adc_oneshot_read_isr())
 	}
 	return data;
 }

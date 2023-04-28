@@ -7,7 +7,7 @@
 
 struct ADC_data
 {
-	esp_err_t messageResult;
+	esp_err_t messageResult[ADC1_PORTS];
 	int data[ADC1_PORTS]; //ldr //can be uint16_t, but create warnings
 };
 
