@@ -63,23 +63,29 @@ jobs:
   deploy-docs:
     name: 'Deploy Documentation'
     needs: make-docs
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download generated documentation artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Docs
+
+      - name: Extract artifacts
+        run: |
+          mkdir -p ./$DOCS_HTML_FOLDER
+          tar -xvf Docs.tar --directory ./$DOCS_HTML_FOLDER
+
       - name: Upload
         uses: nogsantos/scp-deploy@v1.3.0
         with:
-          src: ./docs
+          src: ./$DOCS_HTML_FOLDER
           host: ${{ secrets.SSH_HOST }}
-          remote: /var/www/html/artifacts/${{ github.sha }}
+          remote: /var/www/html/
           port: ${{ secrets.SSH_PORT }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+
+      env:
+        DOCS_HTML_FOLDER: docs_html
