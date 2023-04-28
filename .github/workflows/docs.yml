@@ -80,7 +80,7 @@ jobs:
       - name: Upload
         uses: nogsantos/scp-deploy@v1.3.0
         with:
-          src: ./docs_html
+          src: ./docs_html/*
           host: ${{ secrets.SSH_HOST }}
           remote: /var/www/html/
           port: ${{ secrets.SSH_PORT }}
