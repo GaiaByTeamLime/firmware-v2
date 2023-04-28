@@ -6,7 +6,6 @@ Language: Cpp
 TabWidth: '4'
 PointerAlignment: Left
 UseTab: Always
-QualifierAlignment: QAS_Left
 UseCRLF: false
 
 ...
