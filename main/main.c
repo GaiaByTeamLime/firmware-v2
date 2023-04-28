@@ -1,6 +1,6 @@
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <stdio.h>
 
 #ifdef DEBUG
@@ -10,9 +10,7 @@
 #define LOG(format, ...) /* */
 #endif
 
-
-void app_main(void)
-{
+void app_main(void) {
 	int index = 0;
 	while (1) {
 		LOG("Test! %d", index++);
