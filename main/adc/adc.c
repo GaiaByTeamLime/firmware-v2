@@ -56,7 +56,7 @@ esp_err_t adc_init(void)
  * Get the Data from the ADC
  * data is stored in adc_data
  */
-void pull_latest_data() {
+void pull_latest_data(void) {
 	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
 		adc_result[i].messageResult = adc_oneshot_read(adc1_handle, i, (int*) &adc_result[i].data);//recommendend, doesn't work in an ISR context (instead, use the function adc_oneshot_read_isr())
 	}

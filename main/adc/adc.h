@@ -15,7 +15,7 @@ typedef enum {
 } adc1_port_t;
 
 esp_err_t adc_init(void);
-void pull_latest_data();
+void pull_latest_data(void);
 esp_err_t get_adc_data(adc1_port_t port, uint32_t* data);
 
 #endif //__ADC_HEADER__
