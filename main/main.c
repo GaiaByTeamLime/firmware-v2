@@ -11,7 +11,8 @@
 #endif
 
 
-void app_main(void) {
+void app_main(void)
+{
 	int index = 0;
 	while (1) {
 		LOG("Test! %d", index++);
