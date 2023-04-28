@@ -74,6 +74,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Github Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+      - name: Upload
+        uses: nogsantos/scp-deploy@v1.3
+        with:
+          src: ./docs
+          host: ${{ secrets.SSH_HOST }}
+          remote: /var/www/html/artifacts/${{ github.sha }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
