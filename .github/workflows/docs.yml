@@ -74,9 +74,8 @@ jobs:
 
       - name: Extract artifacts
         run: |
-          ls -la
           mkdir -p ./docs_html
-          tar -xvf Docs.tar --directory ./docs_html
+          tar -xvf artifact.tar --directory ./docs_html
 
       - name: Upload
         uses: nogsantos/scp-deploy@v1.3.0
