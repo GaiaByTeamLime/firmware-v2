@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - name: Upload
-        uses: nogsantos/scp-deploy@v1.3
+        uses: nogsantos/scp-deploy@v1
         with:
           src: ./docs
           host: ${{ secrets.SSH_HOST }}
