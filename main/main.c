@@ -1,7 +1,9 @@
 #include "prelude.h"
 
 #include "adc/adc.h"
+#include "persistent_storage/persistent_storage.h"
 
+#include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -14,6 +16,15 @@ void app_main(void) {
 			LOG("ADC1 Init Error");
 		}
 	}
+
+	persistent_storage_init();
+
+	persistent_storage_set_wifi("ssiddingees", "passdinges");
+	char ssid[WIFI_SSID_MAX_LENGTH];
+	char passwd[WIFI_PASSWORD_MAX_LENGTH];
+	persistent_storage_get_wifi(ssid, passwd);
+
+	LOG("%s\n%s", ssid, passwd);
 
 	while (1) {
 		pull_latest_data();
