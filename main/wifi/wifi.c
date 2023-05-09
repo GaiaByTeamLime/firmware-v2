@@ -4,60 +4,35 @@
 #include <esp_event.h>
 #include <esp_netif.h>
 #include <esp_wifi.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/event_groups.h>
 #include <nvs_flash.h>
 
 #include "esp_err.h"
 #include "esp_wifi_types.h"
 #include "wifi.h"
 
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAILED_BIT BIT1
-
-static EventGroupHandle_t wifi_event_group;
+esp_err_t (*wifi_connected_callback)(void);
 
 static void ip_event_handler(void *arg, esp_event_base_t event_base,
 							 int32_t event_id, void *event_data) {
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
-		xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_BIT);
+		wifi_connected_callback();
 	}
 }
 
 static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 							   int32_t event_id, void *event_data) {
 	// Just keep retrying on disconnects
-	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
+	if (event_id == WIFI_EVENT_STA_DISCONNECTED || event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
 	}
 }
 
-esp_err_t wifi_init(const char *ssid, const char *password) {
-	wifi_event_group = xEventGroupCreate();
-
-	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
-	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
-	esp_netif_create_default_wifi_sta();
-
-	// Setup the init config
-	wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
-	init_config.nvs_enable = false;
-	init_config.nano_enable = false;
-	PASS_ERROR(esp_wifi_init(&init_config), "Failed to init WiFi");
-	LOG("WiFi succesfully initialised");
-
-	// Register events
-	esp_event_handler_instance_t event_wifi_instance, event_ip_instance;
-	esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
-										&wifi_event_handler, NULL,
-										&event_wifi_instance);
-	esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID,
-										&ip_event_handler, NULL,
-										&event_ip_instance);
-
+esp_err_t wifi_start(const char *ssid, const char *password) {
 	// Create a config struct
 	wifi_config_t wifi_config = {.sta = {
+									 .ssid = {0}, // Make the SSID and Password blank, we don't want random bits in these fields
+									 .password = {0},
 									 .threshold.authmode = WIFI_AUTH_WPA2_PSK,
 								 }};
 
@@ -83,20 +58,31 @@ esp_err_t wifi_init(const char *ssid, const char *password) {
 	PASS_ERROR(esp_wifi_start(), "Unable to begin WiFi");
 	LOG("WiFi started");
 
-	PASS_ERROR(esp_wifi_connect(), "Unable to connect to AP");
-	LOG("WiFi connecting");
+	return ESP_OK;
+}
 
-	EventBits_t bits = xEventGroupWaitBits(wifi_event_group,
-										   WIFI_CONNECTED_BIT | WIFI_FAILED_BIT,
-										   pdFALSE, pdFALSE, portMAX_DELAY);
+esp_err_t wifi_init(esp_err_t (*callback)(void)) {
+	wifi_connected_callback = callback;
 
-	if (bits & WIFI_CONNECTED_BIT) {
-		LOG("Great success! We connected!!");
-	} else if (bits & WIFI_FAILED_BIT) {
-		LOG("DEATH.");
-	} else {
-		LOG("DEATH AGAIN.");
-	}
+	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
+	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
+	esp_netif_create_default_wifi_sta();
+
+	// Setup the init config
+	wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
+	init_config.nvs_enable = false;
+	init_config.nano_enable = false;
+	PASS_ERROR(esp_wifi_init(&init_config), "Failed to init WiFi");
+	LOG("WiFi succesfully initialised");
+
+	// Register events
+	esp_event_handler_instance_t event_wifi_instance, event_ip_instance;
+	esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
+										&wifi_event_handler, NULL,
+										&event_wifi_instance);
+	esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID,
+										&ip_event_handler, NULL,
+										&event_ip_instance);
 
 	return ESP_OK;
 }
