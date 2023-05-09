@@ -31,12 +31,15 @@ esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
 		),
 		"Failed to write WiFi SSID to storage"
 	);
+	LOG("NVS set_str");
+
 	PASS_ERROR(
 		persistent_storage_set_str(
 			&nvs, WIFI_PASSWORD_KEY, password, WIFI_PASSWORD_MAX_LENGTH
 		),
 		"Failed to write WiFi password to"
 	);
+	LOG("NVS set_str");
 
 	PASS_ERROR(nvs_commit(nvs), "Failed to commit NVS");
 	LOG("NVS Commit");
@@ -50,14 +53,24 @@ esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
 esp_err_t persistent_storage_get_wifi(char* ssid, char* password) {
 	nvs_handle_t nvs;
 	PASS_ERROR(
-		nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs),
+		nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs),
 		"Failed to open NVS storage"
 	);
+	LOG("NVS Open");
 
+	size_t max_length = WIFI_SSID_CHAR_BUFFER_LENGTH;
 	PASS_ERROR(
-		nvs_get_str(nvs, WIFI_SSID_KEY, ssid, (size_t*)WIFI_SSID_MAX_LENGTH),
-		"Failed to get WiFi SSID from NVS Storage"
+		nvs_get_str(nvs, WIFI_SSID_KEY, ssid, &max_length),
+		"Failed to get WiFi SSID from NVS storage"
 	);
+	LOG("NVS get_str");
+
+	max_length = WIFI_PASSWORD_CHAR_BUFFER_LENGTH;
+	PASS_ERROR(
+		nvs_get_str(nvs, WIFI_PASSWORD_KEY, password, &max_length),
+		"Failed to get WiFi Password from NVS storage"
+	);
+	LOG("NVS get_str");
 
 	nvs_close(nvs);
 	LOG("NVS Close");
