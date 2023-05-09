@@ -12,29 +12,34 @@
 
 esp_err_t (*wifi_connected_callback)(void);
 
-static void ip_event_handler(void *arg, esp_event_base_t event_base,
-							 int32_t event_id, void *event_data) {
+static void ip_event_handler(
+	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
+) {
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
 		wifi_connected_callback();
 	}
 }
 
-static void wifi_event_handler(void *arg, esp_event_base_t event_base,
-							   int32_t event_id, void *event_data) {
+static void wifi_event_handler(
+	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
+) {
 	// Just keep retrying on disconnects
-	if (event_id == WIFI_EVENT_STA_DISCONNECTED || event_id == WIFI_EVENT_STA_START) {
+	if (event_id == WIFI_EVENT_STA_DISCONNECTED ||
+		event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
 	}
 }
 
-esp_err_t wifi_start(const char *ssid, const char *password) {
+esp_err_t wifi_start(const char* ssid, const char* password) {
 	// Create a config struct
-	wifi_config_t wifi_config = {.sta = {
-									 .ssid = {0}, // Make the SSID and Password blank, we don't want random bits in these fields
-									 .password = {0},
-									 .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-								 }};
+	wifi_config_t wifi_config = {
+		.sta = {
+			.ssid = {0}, // Make the SSID and Password blank, we don't want
+						 // random bits in these fields
+			.password = {0},
+			.threshold.authmode = WIFI_AUTH_WPA2_PSK,
+		}};
 
 	// Copy the SSID and the password to the wifi config
 	uint8_t copy_index = 0;
@@ -48,11 +53,14 @@ esp_err_t wifi_start(const char *ssid, const char *password) {
 
 	// We have to set the mode BEFORE setting the config
 	PASS_ERROR(esp_wifi_set_mode(WIFI_MODE_STA), "Unable to set WiFi mode");
-	PASS_ERROR(esp_wifi_set_config(WIFI_IF_STA, &wifi_config),
-			   "Unable to configure WiFi");
+	PASS_ERROR(
+		esp_wifi_set_config(WIFI_IF_STA, &wifi_config),
+		"Unable to configure WiFi"
+	);
 	PASS_ERROR(
 		esp_wifi_set_ps(WIFI_PS_NONE),
-		"Unable to set Power Saving mode"); // TODO: figure out which PS we need
+		"Unable to set Power Saving mode"
+	); // TODO: figure out which PS we need
 	LOG("WiFi configured");
 
 	PASS_ERROR(esp_wifi_start(), "Unable to begin WiFi");
@@ -77,12 +85,13 @@ esp_err_t wifi_init(esp_err_t (*callback)(void)) {
 
 	// Register events
 	esp_event_handler_instance_t event_wifi_instance, event_ip_instance;
-	esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
-										&wifi_event_handler, NULL,
-										&event_wifi_instance);
-	esp_event_handler_instance_register(IP_EVENT, ESP_EVENT_ANY_ID,
-										&ip_event_handler, NULL,
-										&event_ip_instance);
+	esp_event_handler_instance_register(
+		WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL,
+		&event_wifi_instance
+	);
+	esp_event_handler_instance_register(
+		IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, NULL, &event_ip_instance
+	);
 
 	return ESP_OK;
 }
