@@ -19,12 +19,11 @@ void app_main(void) {
 
 	persistent_storage_init();
 
-	persistent_storage_set_wifi("ssiddingees", "passdinges");
-	char ssid[WIFI_SSID_MAX_LENGTH];
-	char passwd[WIFI_PASSWORD_MAX_LENGTH];
+	char ssid[WIFI_SSID_CHAR_BUFFER_LENGTH];
+	char passwd[WIFI_PASSWORD_CHAR_BUFFER_LENGTH];
 	persistent_storage_get_wifi(ssid, passwd);
 
-	LOG("%s\n%s", ssid, passwd);
+	LOG("SSID: %s\tPassword: %s", ssid, passwd);
 
 	while (1) {
 		pull_latest_data();

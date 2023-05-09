@@ -2,9 +2,9 @@ Welcome to Gaia Firmware's documentation!
 =========================================
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   api_reference/index
+    api_reference/index
 
 
 
