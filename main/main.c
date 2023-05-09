@@ -1,13 +1,16 @@
 #include "prelude.h"
 
 #include "adc/adc.h"
+#include "persistent_storage/persistent_storage.h"
 
+#include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 void app_main(void) {
 	int index = 0;
 
+	persistent_storage_init();
 	esp_err_t message = adc_init();
 	if (message != ESP_OK) {
 		while (1) {

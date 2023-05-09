@@ -28,8 +28,9 @@ esp_err_t adc_init(void) {
 								   // super low power mode (now disabled)
 	};
 
-	PASS_ERROR(adc_oneshot_new_unit(&init_config1, &adc1_handle),
-			   "ADC1 init failed");
+	PASS_ERROR(
+		adc_oneshot_new_unit(&init_config1, &adc1_handle), "ADC1 init failed"
+	);
 
 	// ADC1 Config
 	adc_oneshot_chan_cfg_t config = {
@@ -39,8 +40,10 @@ esp_err_t adc_init(void) {
 	};
 
 	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
-		PASS_ERROR(adc_oneshot_config_channel(adc1_handle, i, &config),
-				   "ADC1 channel config failed");
+		PASS_ERROR(
+			adc_oneshot_config_channel(adc1_handle, i, &config),
+			"ADC1 channel config failed"
+		);
 	}
 
 	// ADC1 Calibration Init
@@ -63,9 +66,9 @@ void pull_latest_data(void) {
 	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
 		adc_result[i].messageResult = adc_oneshot_read(
 			adc1_handle, i,
-			(int*)&adc_result[i]
-				.data); // recommendend, doesn't work in an ISR context
-						// (instead, use the function adc_oneshot_read_isr())
+			(int*)&adc_result[i].data
+		); // recommendend, doesn't work in an ISR context
+		   // (instead, use the function adc_oneshot_read_isr())
 	}
 }
 

@@ -5,6 +5,7 @@ AlignEscapedNewlines: DontAlign
 Language: Cpp
 TabWidth: '4'
 PointerAlignment: Left
+AlignAfterOpenBracket: BlockIndent
 UseTab: Always
 UseCRLF: false
 
