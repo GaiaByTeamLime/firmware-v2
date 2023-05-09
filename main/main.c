@@ -12,6 +12,5 @@ void app_main(void) {
 	LOG("Init");
 
 	wifi_init(&on_wifi_connect);
-	wifi_start( "TestSpot", "baguette" );
+	wifi_start("TestSpot", "baguette");
 }
-
