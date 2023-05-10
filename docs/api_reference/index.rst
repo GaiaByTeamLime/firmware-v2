@@ -6,4 +6,3 @@ API Reference
 
     prelude.rst
     persistent_storage.rst
-    wifi.rst
