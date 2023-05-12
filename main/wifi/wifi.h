@@ -4,7 +4,8 @@
 #include <esp_err.h>
 
 /**
- * Setup the entire WiFi driver and immediately connect to the network.
+ * Setup the entire WiFi driver, register a callback function for
+ * when the device connects to a network.
  * At the current moment, we only support WPA2-PSK encryption method
  *
  * @param esp_err_t(void) The callback function to be invoked once the device
