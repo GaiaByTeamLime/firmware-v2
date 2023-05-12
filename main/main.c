@@ -11,9 +11,8 @@
 #include <freertos/task.h>
 
 void app_main(void) {
-	// int index = 0;
-
 	persistent_storage_init();
+
 	esp_err_t message = adc_init();
 	if (message != ESP_OK) {
 		while (1) {
@@ -22,8 +21,7 @@ void app_main(void) {
 	}
 
 	spi2_init();
-
-	spi_device_handle_t rfid_handle;
+	spi_device_handle_t rfid_handle = { 0 };
 	rfid_init(&rfid_handle);
 
 	// while (1) {

@@ -14,7 +14,7 @@ esp_err_t spi2_init() {
 		spi_bus_initialize(SPI2_HOST, &bus_config, SPI_DMA_CH_AUTO),
 		"Could not initialize SPI2 Host"
 	);
-	LOG("SPI2 Host initialize");
+	LOG("SPI2 host initialize");
 
 	return ESP_OK;
 }
