@@ -2,11 +2,11 @@
 
 #include "adc/adc.h"
 #include "persistent_storage/persistent_storage.h"
-#include "spi/spi.h"
 #include "rfid/rfid.h"
+#include "spi/spi.h"
 
-#include <esp_err.h>
 #include <driver/spi_master.h>
+#include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

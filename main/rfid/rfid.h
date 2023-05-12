@@ -3,10 +3,10 @@
 
 #include "../prelude.h"
 
-#include <esp_err.h>
+#include <driver/gpio.h>
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
-#include <driver/gpio.h>
+#include <esp_err.h>
 
 #define RFID_SPI_HOST SPI2_HOST
 #define RFID_SPI_MODE 0
