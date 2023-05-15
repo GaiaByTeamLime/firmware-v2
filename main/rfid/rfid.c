@@ -25,3 +25,7 @@ esp_err_t rfid_send_register(spi_device_handle_t* handle, rfid_pcd_register_t re
 esp_err_t rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command) {
 	return rfid_send_register(handle, COMMAND_REG, command);
 }
+
+esp_err_t rfid_read_register(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* result) {
+	return spi_read_byte(handle, reg | 0x80, result);
+}

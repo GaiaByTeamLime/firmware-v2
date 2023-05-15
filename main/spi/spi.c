@@ -1,5 +1,7 @@
 #include "spi.h"
 #include "prelude.h"
+/* #include <freertos/FreeRTOS.h>
+#include <freertos/task.h> */
 
 esp_err_t spi2_init() {
 	const spi_bus_config_t bus_config = {
@@ -16,6 +18,20 @@ esp_err_t spi2_init() {
 		"Could not initialize SPI2 Host"
 	);
 	LOG("SPI2 host initialize");
+
+	return ESP_OK;
+}
+
+esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data, uint8_t* result) {
+	PASS_ERROR(
+		spi_send_byte(handle, data)
+		, "" //errormessage already logged in function
+	);
+	
+	PASS_ERROR(
+		spi_device_get_trans_result(*handle, result, pdMS_TO_TICKS(1000))
+		, "Could not get SPI transfer result"
+	);
 
 	return ESP_OK;
 }

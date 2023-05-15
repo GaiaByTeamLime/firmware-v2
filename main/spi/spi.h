@@ -38,4 +38,13 @@ esp_err_t spi_send_bytes(
 	spi_device_handle_t* handle, uint8_t* data, uint16_t data_length
 );
 
+/**
+ * Read a byte from SPI
+ * 
+ * @param handle The SPI Device handle to send the bytes to
+ * @param data The byte you want to the to the device
+ * @param result The variable containing the result of the transfer
+ */
+esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data, uint8_t* result);
+
 #endif
