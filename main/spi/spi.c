@@ -22,20 +22,6 @@ esp_err_t spi2_init() {
 	return ESP_OK;
 }
 
-esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data, uint8_t* result) {
-	PASS_ERROR(
-		spi_send_byte(handle, data)
-		, "" //errormessage already logged in function
-	);
-	
-	PASS_ERROR(
-		spi_device_get_trans_result(*handle, result, pdMS_TO_TICKS(1000))
-		, "Could not get SPI transfer result"
-	);
-
-	return ESP_OK;
-}
-
 esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
 	spi_transaction_t transaction = {0};
 
@@ -56,11 +42,15 @@ esp_err_t spi_send_bytes(
 
 	transaction.tx_buffer = data;
 	transaction.length = data_length * 8;
+	transaction.rxlength = transaction.length;
+
+	uint8_t rxbuffer[transaction.rxlength];
 
 	PASS_ERROR(
 		spi_device_transmit(*handle, &transaction), "Could not transfer SPI"
 	);
 
+	LOG("%x", rxbuffer[1]);
+
 	return ESP_OK;
 }
-
