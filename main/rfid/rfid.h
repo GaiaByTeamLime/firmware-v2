@@ -19,9 +19,21 @@
 esp_err_t rfid_init(spi_device_handle_t* handle);
 
 /**
+ * Send data to a register to the RC522
  *
+ * @param spi_device_handle_t* handle The SPI device handle
+ * @param rfid_pcd_register_t reg The register to send data too
+ * @param uint8_t data The data to set to the register
  */
 esp_err_t rfid_send_register(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data);
+/**
+ * Send a command to the RC522
+ *
+ * This is basically just an alias to rfid_send_register(COMMAND_REG, command)
+ *
+ * @param spi_device_handle_t* handle The SPI device handle
+ * @param rfid_pcd_command_t data The data to set to the register
+ */
 esp_err_t rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command);
 
 #endif
