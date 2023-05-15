@@ -49,9 +49,9 @@ typedef enum {
 
 	// Page 2: Configuration
 	// 						  0x20			// reserved for future use
-	CRC_RESULT_REG_H =
+	CRC_RESULT_MSB_REG =
 		0x21 << 1, // shows the MSB and LSB values of the CRC calculation
-	CRC_RESULT_REG_L = 0x22 << 1,
+	CRC_RESULT_LSB_REG = 0x22 << 1,
 	// 						  0x23			// reserved for future use
 	MOD_WIDTH_REG = 0x24 << 1, // controls the ModWidth setting?
 	// 						  0x25			// reserved for future use
