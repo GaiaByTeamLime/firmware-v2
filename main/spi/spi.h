@@ -18,8 +18,24 @@
  * Initialize the SPI2 Host
  */
 esp_err_t spi2_init();
-esp_err_t spi_send_byte(
-	spi_device_handle_t* handle, const uint8_t data, bool keep_cs_active
+
+/**
+ * Send a byte over SPI
+ *
+ * @param handle The SPI Device handle to send the byte to
+ * @param data The byte you want to the to the device
+ */
+esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data);
+
+/**
+ * Send a byte array over SPI
+ *
+ * @param handle The SPI Device handle to send the bytes to
+ * @param data The byte array containing the data you want to send to the device
+ * @param data_length The length of the byte array
+ */
+esp_err_t spi_send_bytes(
+	spi_device_handle_t* handle, uint8_t* data, uint16_t data_length
 );
 
 #endif

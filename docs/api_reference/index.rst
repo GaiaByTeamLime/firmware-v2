@@ -6,3 +6,4 @@ API Reference
 
     prelude.rst
     persistent_storage.rst
+    spi.rst

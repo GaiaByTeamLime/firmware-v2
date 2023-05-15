@@ -27,10 +27,10 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	spi_device_acquire_bus(rfid_handle, portMAX_DELAY);
-	spi_send_byte(&rfid_handle, 0x10, true);
-	spi_send_byte(&rfid_handle, 0x11, false);
-	spi_device_release_bus(rfid_handle);
+	uint8_t data[2];
+	data[0] = 0x10;
+	data[1] = 0x11;
+	spi_send_bytes(&rfid_handle, data, sizeof(data));
 
 	// while (1) {
 	// 	pull_latest_data();
