@@ -1,4 +1,5 @@
 #include "spi.h"
+#include "prelude.h"
 
 esp_err_t spi2_init() {
 	const spi_bus_config_t bus_config = {
@@ -46,3 +47,4 @@ esp_err_t spi_send_bytes(
 
 	return ESP_OK;
 }
+

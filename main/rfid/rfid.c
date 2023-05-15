@@ -1,3 +1,4 @@
+#include "spi.h"
 #include "rfid.h"
 
 esp_err_t rfid_init(spi_device_handle_t* handle) {
@@ -14,4 +15,13 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 	);
 
 	return ESP_OK;
+}
+
+esp_err_t rfid_send_register(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data) {
+	uint8_t send_data[2] = { reg, data };
+	return spi_send_bytes(handle, send_data, 2);
+}
+
+esp_err_t rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command) {
+	return rfid_send_register(handle, COMMAND_REG, command);
 }
