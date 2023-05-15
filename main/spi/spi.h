@@ -18,5 +18,8 @@
  * Initialize the SPI2 Host
  */
 esp_err_t spi2_init();
+esp_err_t spi_send_byte(
+	spi_device_handle_t* handle, const uint8_t data, bool keep_cs_active
+);
 
 #endif

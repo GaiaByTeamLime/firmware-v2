@@ -18,3 +18,22 @@ esp_err_t spi2_init() {
 
 	return ESP_OK;
 }
+
+esp_err_t spi_send_byte(
+	spi_device_handle_t* handle, const uint8_t data, bool keep_cs_active
+) {
+	spi_transaction_t transaction = {0};
+
+	transaction.tx_buffer = &data;
+	transaction.length = 8;
+
+	if (keep_cs_active) {
+		transaction.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+	}
+
+	PASS_ERROR(
+		spi_device_transmit(*handle, &transaction), "Could not transfer SPI"
+	);
+
+	return ESP_OK;
+}

@@ -12,6 +12,7 @@
 #include <freertos/task.h>
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
+	PASS_ERROR(adc_init(), "ADC1 Init Error");
 	PASS_ERROR(
 		persistent_storage_init(), "Could not initialize persistent storage"
 	);
@@ -23,16 +24,13 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 }
 
 void app_main(void) {
-	esp_err_t message = adc_init();
-	if (message != ESP_OK) {
-		while (1) {
-			LOG("ADC1 Init Error");
-		}
-	}
-
-	spi2_init();
 	spi_device_handle_t rfid_handle = {0};
-	rfid_init(&rfid_handle);
+	setup(&rfid_handle);
+
+	spi_device_acquire_bus(rfid_handle, portMAX_DELAY);
+	spi_send_byte(&rfid_handle, 0x10, true);
+	spi_send_byte(&rfid_handle, 0x11, false);
+	spi_device_release_bus(rfid_handle);
 
 	// while (1) {
 	// 	pull_latest_data();
