@@ -1,3 +1,6 @@
+#ifndef __RFID_TYPES_HEADER__
+#define __RFID_TYPES_HEADER__
+
 typedef enum {
 	// Page 0: Command and status
 	//						  0x00			// reserved for future use
@@ -110,3 +113,5 @@ typedef enum {
 		0x0E, // performs the MIFARE standard authentication as a reader
 	PCD_SOFT_RESET = 0x0F // resets the MFRC522
 } rfid_pcd_command_t;
+
+#endif

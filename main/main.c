@@ -3,6 +3,7 @@
 #include "adc/adc.h"
 #include "persistent_storage/persistent_storage.h"
 #include "rfid/rfid.h"
+#include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
 
 #include <driver/spi_common.h>
@@ -27,10 +28,11 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	uint8_t data[2];
-	data[0] = 0x10;
-	data[1] = 0x11;
-	spi_send_bytes(&rfid_handle, data, sizeof(data));
+	rfid_pcd_register_t data[1];
+	uint8_t buffer[1];
+	data[0] = MODE_REG | 0x80;
+	rfid_read_registers(&rfid_handle, data, buffer, 1);
+	LOG("-> 0x%02x", buffer[0]);
 
 	// while (1) {
 	// 	pull_latest_data();

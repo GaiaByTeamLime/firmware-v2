@@ -1,6 +1,8 @@
 #include "spi.h"
 #include "rfid.h"
 
+#include <stdlib.h>
+
 esp_err_t rfid_init(spi_device_handle_t* handle) {
 	const spi_device_interface_config_t device_config = {
 		.mode = RFID_SPI_MODE,
@@ -26,6 +28,26 @@ esp_err_t rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t comm
 	return rfid_send_register(handle, COMMAND_REG, command);
 }
 
-esp_err_t rfid_read_register(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* result) {
-	return spi_read_byte(handle, reg | 0x80, result);
+esp_err_t rfid_read_registers(
+	spi_device_handle_t* handle, rfid_pcd_register_t* registers, uint8_t* buffer, uint16_t length
+) {
+	// Yay! Heap memory time!
+	uint8_t* shifted_buffer = (uint8_t*)malloc((length + 1) * sizeof(uint8_t));
+
+	spi_transaction_t transaction = {0};
+	transaction.tx_buffer = registers;
+	transaction.length = (length * 2) * 8;
+	transaction.rx_buffer = shifted_buffer;
+
+	// Transmit
+	PASS_ERROR(spi_device_transmit(*handle, &transaction), "Unable to transmit");
+
+	// Copy the shifted buffer into the correct position
+	for (uint16_t index = 1; index < length + 1; index++) {
+		buffer[index - 1] = shifted_buffer[index];
+	}
+	// I'm a good programmer, I don't forget to clean my heap
+	free(shifted_buffer);
+
+	return ESP_OK;
 }
