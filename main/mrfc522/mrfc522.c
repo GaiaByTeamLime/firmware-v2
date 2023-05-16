@@ -45,7 +45,7 @@ esp_err_t mrfc522_transceive_picc(
 
 	rfid_pcd_register_t registers[] = {COM_IRQ_REG, ERROR_REG, FIFO_LEVEL_REG};
 
-	uint8_t attempts_left = 35; // Wait max 35ms for transmission
+	uint16_t attempts_left = 500; // Wait max 35ms for transmission
 	uint8_t output_buffer[1] = {0};
 	while (attempts_left) {
 		PASS_ERROR(
@@ -53,7 +53,7 @@ esp_err_t mrfc522_transceive_picc(
 			"Unable to read register"
 		);
 		// If the IRq fired, don't wait needlessly, break out
-		LOG("OUTPUT %x", output_buffer[0]);
+		// LOG("=> %02x", output_buffer[0]);
 		if (output_buffer[0] & 0x30) {
 			break;
 		}
@@ -113,7 +113,7 @@ esp_err_t mrfc522_calculate_crc(
 	);
 
 	// Wait for the IRQ signal to fire
-	uint8_t attempts_left = 50; // Wait at max 50ms
+	uint16_t attempts_left = 500; // Wait at max 50ms
 	uint8_t irq_buffer[1] = {0};
 	while (attempts_left) {
 		PASS_ERROR(
@@ -121,7 +121,7 @@ esp_err_t mrfc522_calculate_crc(
 			"Unable to read register"
 		);
 		// If the IRq fired, don't wait needlessly, break out
-		if (irq_buffer[0] & 0x03) {
+		if (irq_buffer[0] & 0x04) {
 			break;
 		}
 		// Wait before retrying
