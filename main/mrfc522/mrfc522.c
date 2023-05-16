@@ -10,11 +10,79 @@
 
 // Specific init codes found from:
 // https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp
+esp_err_t mrfc522_transceive_picc(
+	spi_device_handle_t* handle, uint8_t* write_data,
+	const uint16_t write_length, uint8_t* read_data, const uint16_t read_length
+) {
+	PASS_ERROR(
+		rfid_send_command(handle, PCD_IDLE), "Unable to stop active command"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, COM_IRQ_REG, 0x7f),
+		"Unable to clear all IRq's"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, FIFO_LEVEL_REG, 0x80),
+		"Unable to flush FIFO"
+	);
+	PASS_ERROR(
+		rfid_write_register_datastream(
+			handle, FIFO_DATA_REG, write_data, write_length
+		),
+		"Unable to stream data to FIFO buffer"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, BIT_FRAMING_REG, 0),
+		"Unable to set bit adjustment"
+	);
+	PASS_ERROR(
+		rfid_send_command(handle, PCD_TRANSCEIVE),
+		"Unable to signal start of transmission"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, BIT_FRAMING_REG, 0x80),
+		"Unable to signal start of transmission"
+	)
 
-esp_err_t mrfc522_fifo_transaction(spi_device_handle_t* handle) {
-	PASS_ERROR(rfid_write_register(handle, COMMAND_REG, PCD_IDLE), "");
-	PASS_ERROR(rfid_write_register(handle, COM_IRQ_REG, 0x7f), "");
-	PASS_ERROR(rfid_write_register(handle, FIFO_LEVEL_REG, 0x80), "");
+	rfid_pcd_register_t registers[] = {COM_IRQ_REG, ERROR_REG, FIFO_LEVEL_REG};
+
+	uint8_t attempts_left = 35; // Wait max 35ms for transmission
+	uint8_t output_buffer[1] = {0};
+	while (attempts_left) {
+		PASS_ERROR(
+			rfid_read_registers(handle, registers, output_buffer, 1),
+			"Unable to read register"
+		);
+		// If the IRq fired, don't wait needlessly, break out
+		LOG("OUTPUT %x", output_buffer[0]);
+		if (output_buffer[0] & 0x30) {
+			break;
+		}
+		// Wait before retrying
+		vTaskDelay(pdMS_TO_TICKS(1));
+		attempts_left--;
+	}
+	if (!attempts_left) {
+		ELOG("Transceive took to long! Timed-out.");
+		return ESP_ERR_TIMEOUT;
+	}
+
+	// Make sure no weird error happened in the meantime
+	rfid_read_registers(handle, registers + 1, output_buffer, 1);
+	if (output_buffer[0] & 0x13) {
+		ELOG("Error during transceive!");
+		return ESP_ERR_INVALID_STATE;
+	}
+
+	// Read back the result!
+	rfid_read_registers(handle, registers + 2, output_buffer, 1);
+	uint8_t bytes_in_fifo = output_buffer[0];
+	rfid_read_register_datastream(
+		handle, FIFO_DATA_REG, read_data, bytes_in_fifo
+	);
+
+	return ESP_OK;
+}
 
 	const uint16_t length = 1;
 	uint8_t data[length];
