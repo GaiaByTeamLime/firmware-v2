@@ -16,6 +16,27 @@ esp_err_t mrfc522_fifo_transaction(spi_device_handle_t* handle) {
 	uint8_t data[length];
 	PASS_ERROR(rfrid_write_register_datastream(handle, FIFO_DATA_REG, data, length), "");
 
+esp_err_t mrfc522_enable_antenna(spi_device_handle_t* handle) {
+	const uint16_t length = 1;
+	rfid_pcd_register_t target_register[length];
+	uint8_t response[length];
+	target_register[0] = TX_CONTROL_REG;
+	PASS_ERROR(rfid_read_registers(handle, target_register, response, length), "Unable to read from TxControlReg");
+	if (!(response[0] & ANTENNA_CONTROL_MASK)) {
+		PASS_ERROR(rfid_write_register(handle, TX_CONTROL_REG, response[0] | ANTENNA_CONTROL_MASK), "Unable to write to TxControlReg");
+	}
+	return ESP_OK;
+}
+
+esp_err_t mrfc522_disable_antenna(spi_device_handle_t* handle) {
+	const uint16_t length = 1;
+	rfid_pcd_register_t target_register[length];
+	uint8_t response[length];
+	target_register[0] = TX_CONTROL_REG;
+	PASS_ERROR(rfid_read_registers(handle, target_register, response, length), "Unable to read from TxControlReg");
+	if (response[0] & ANTENNA_CONTROL_MASK) {
+		PASS_ERROR(rfid_write_register(handle, TX_CONTROL_REG, response[0] & (~ANTENNA_CONTROL_MASK)), "Unable to write to TxControlReg");
+	}
 	return ESP_OK;
 }
 
