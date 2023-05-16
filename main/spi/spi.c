@@ -1,9 +1,6 @@
 #include "spi.h"
 #include "prelude.h"
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-
 esp_err_t spi2_init() {
 	const spi_bus_config_t bus_config = {
 		.mosi_io_num = SPI2_MOSI_PIN,
@@ -29,10 +26,16 @@ esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
 	transaction.tx_buffer = &data;
 	transaction.length = 8;
 
-	PASS_ERROR(
-		spi_device_transmit(*handle, &transaction), "Could not transfer SPI"
-	);
-
-	return ESP_OK;
+	return spi_device_transmit(*handle, &transaction);
 }
 
+esp_err_t spi_send_bytes(
+	spi_device_handle_t* handle, const uint8_t* data, const uint16_t length
+) {
+	spi_transaction_t transaction = {0};
+
+	transaction.tx_buffer = &data;
+	transaction.length = length * 8;
+
+	return spi_device_transmit(*handle, &transaction);
+}

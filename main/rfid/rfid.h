@@ -40,8 +40,8 @@ esp_err_t
 rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command);
 
 esp_err_t rfid_read_registers(
-	spi_device_handle_t* handle, rfid_pcd_register_t* registers,
-	uint8_t* buffer, uint16_t length
+	spi_device_handle_t* handle, const rfid_pcd_register_t* registers,
+	uint8_t* buffer, const uint16_t length
 );
 
 #endif
