@@ -16,6 +16,13 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 		"Unable to add RFID SPI device to SPI host"
 	);
 
+	//initialize (TODO)
+
+	//rfid_send_register(handle, MODE_REG, (1 << 7)); // handle MSB first (read data from CRC_RESULT_MSB_REG)
+	//rfid_send_register(handle, RX_MODE_REG, (1 << 7)); //enable CRC calculation during reception
+
+	rfid_send_command(handle, PCD_RECEIVE); //set PCD to recieve mode
+
 	return ESP_OK;
 }
 

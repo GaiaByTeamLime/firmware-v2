@@ -13,7 +13,7 @@ typedef enum {
 	DIV_IRQ_REG = 0x05 << 1, // interrupt request bits
 	ERROR_REG = 0x06 << 1, // error bits showing the error status of the last //
 						   // command executed
-	STATUS1_REG = 0x07 << 1,	// communication status bits
+	STATUS_1_REG = 0x07 << 1,	// communication status bits
 	STATUS_2_REG = 0x08 << 1,	// receiver and transmitter status bits
 	FIFO_DATA_REG = 0x09 << 1,	// input and output of 64 byte FIFO buffer
 	FIFO_LEVEL_REG = 0x0A << 1, // number of bytes stored in the FIFO buffer
