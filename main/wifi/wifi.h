@@ -8,7 +8,7 @@
  * when the device connects to a network.
  * At the current moment, we only support WPA2-PSK encryption method
  *
- * @param esp_err_t(void) The callback function to be invoked once the device
+ * @param callback The callback function to be invoked once the device
  * connected to a network
  * @return Any error the WiFi driver may have encountered
  */
