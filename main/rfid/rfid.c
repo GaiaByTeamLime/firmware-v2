@@ -40,7 +40,7 @@ esp_err_t rfid_read_registers(
 	}
 
 	spi_transaction_t transaction = {0};
-	transaction.tx_buffer = registers;
+	transaction.tx_buffer = read_registers;
 	transaction.length = (length * 2) * 8;
 	transaction.rx_buffer = shifted_buffer;
 
