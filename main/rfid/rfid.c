@@ -31,10 +31,16 @@ esp_err_t rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t comm
 esp_err_t rfid_read_registers(
 	spi_device_handle_t* handle, const rfid_pcd_register_t* registers, uint8_t* buffer, const uint16_t length
 ) {
-	uint8_t shifted_buffer[length];
+	uint8_t shifted_buffer[length + 1];
+	rfid_pcd_register_t read_registers[length];
+
+	// Make sure the registers we send are marked as 'read'
+	for (uint16_t index = 0; index < length; index++) {
+		read_registers[index] = registers[index] | 0x80;
+	}
 
 	spi_transaction_t transaction = {0};
-	transaction.tx_buffer = registers;
+	transaction.tx_buffer = read_registers;
 	transaction.length = (length * 2) * 8;
 	transaction.rx_buffer = shifted_buffer;
 
