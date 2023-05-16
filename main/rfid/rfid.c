@@ -28,7 +28,7 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 	return ESP_OK;
 }
 
-esp_err_t rfid_send_register(
+esp_err_t rfid_write_register(
 	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data
 ) {
 	return spi_send_word(handle, reg << 8 | data);
@@ -36,7 +36,17 @@ esp_err_t rfid_send_register(
 
 esp_err_t
 rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command) {
-	return rfid_send_register(handle, COMMAND_REG, command);
+	return rfid_write_register(handle, COMMAND_REG, command);
+}
+
+esp_err_t rfrid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream, const uint16_t length) {
+	uint8_t stream[length + 1];
+	stream[0] = reg;
+	for (uint16_t index = 1; index < length + 1; index++) {
+		stream[index] = datastream[index - 1];
+	}
+	spi_send_datastream(handle, stream, length + 1);
+	return ESP_OK;
 }
 
 esp_err_t rfid_read_registers(

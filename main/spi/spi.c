@@ -1,4 +1,5 @@
 #include "spi.h"
+#include "driver/spi_master.h"
 #include "prelude.h"
 
 esp_err_t spi2_init() {
@@ -21,24 +22,25 @@ esp_err_t spi2_init() {
 }
 
 esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
-	uint8_t tx_buffer[2] = {0};
-	uint8_t rx_buffer[2] = {0};
-
-	LOG("Sending %x", data);
-	tx_buffer[0] = data;
-	tx_buffer[1] = 0x3e;
+	uint8_t tx_buffer[1] = {data};
 
 	spi_transaction_t transaction = {0};
 	transaction.tx_buffer = tx_buffer;
-	transaction.length = 16;
-	transaction.rx_buffer = rx_buffer;
+	transaction.length = 8;
+
+	return spi_device_transmit(*handle, &transaction);
+}
+
+esp_err_t spi_send_datastream(spi_device_handle_t* handle, const uint8_t* data, const uint16_t length) {
+	spi_transaction_t transaction = {0};
+	transaction.tx_buffer = data;
+	transaction.length = length * 8;
 
 	return spi_device_transmit(*handle, &transaction);
 }
 
 esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word) {
 	uint8_t tx_buffer[2] = {0};
-	uint8_t rx_buffer[2] = {0};
 
 	tx_buffer[0] = word >> 8;
 	tx_buffer[1] = word;
@@ -46,7 +48,6 @@ esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word) {
 	spi_transaction_t transaction = {0};
 	transaction.tx_buffer = tx_buffer;
 	transaction.length = 16;
-	transaction.rx_buffer = rx_buffer;
 
 	return spi_device_transmit(*handle, &transaction);
 }

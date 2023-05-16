@@ -43,4 +43,6 @@ esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data);
  */
 esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word);
 
+esp_err_t spi_send_datastream(spi_device_handle_t* handle, const uint8_t* data, const uint16_t length);
+
 #endif
