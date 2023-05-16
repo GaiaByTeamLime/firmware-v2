@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "prelude.h"
+#include "../prelude.h"
+#include "../spi/spi.h"
 #include "rfid.h"
-#include "spi.h"
 
 esp_err_t rfid_init(spi_device_handle_t* handle) {
 	const spi_device_interface_config_t device_config = {
@@ -17,10 +17,11 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 		"Unable to add RFID SPI device to SPI host"
 	);
 
-	//initialize (TODO)
+	// initialize (TODO)
 
-	//rfid_send_register(handle, MODE_REG, (1 << 7)); // handle MSB first (read data from CRC_RESULT_MSB_REG)
-	//rfid_send_register(handle, RX_MODE_REG, (1 << 7)); //enable CRC calculation during reception
+	// rfid_send_register(handle, MODE_REG, (1 << 7)); // handle MSB first (read
+	// data from CRC_RESULT_MSB_REG) rfid_send_register(handle, RX_MODE_REG, (1
+	// << 7)); //enable CRC calculation during reception
 
 	// rfid_send_command(handle, PCD_RECEIVE); //set PCD to recieve mode
 
@@ -30,8 +31,7 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 esp_err_t rfid_send_register(
 	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data
 ) {
-	uint8_t send_data[2] = {reg, data};
-	return spi_send_bytes(handle, send_data, 2);
+	return spi_send_word(handle, reg, data);
 }
 
 esp_err_t
@@ -52,7 +52,7 @@ esp_err_t rfid_read_registers(
 
 	// Create small buffers for each transaction
 	uint8_t current_register[2] = {0}; // [0] = The register, [1] = Always 0
-	uint8_t rx_buffer[2]; // [0] = Ignore, [1] = The data
+	uint8_t rx_buffer[2];			   // [0] = Ignore, [1] = The data
 	for (uint16_t index = 0; index < length; index++) {
 		current_register[0] = read_registers[index];
 
@@ -61,7 +61,9 @@ esp_err_t rfid_read_registers(
 		transaction.length = 16;
 		transaction.rx_buffer = rx_buffer;
 
-		PASS_ERROR(spi_device_transmit(*handle, &transaction), "Unable to transmit");
+		PASS_ERROR(
+			spi_device_transmit(*handle, &transaction), "Unable to transmit"
+		);
 
 		buffer[index] = rx_buffer[1];
 	}
