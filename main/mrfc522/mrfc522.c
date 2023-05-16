@@ -1,6 +1,7 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <stdlib.h>
 
 #include "mrfc522.h"
 #include "prelude.h"
@@ -8,8 +9,6 @@
 #include "rfid_pcd_register_types.h"
 #include "spi.h"
 
-// Specific init codes found from:
-// https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp
 esp_err_t mrfc522_transceive_picc(
 	spi_device_handle_t* handle, uint8_t* write_data,
 	const uint16_t write_length, uint8_t* read_data, const uint16_t read_length
@@ -84,9 +83,6 @@ esp_err_t mrfc522_transceive_picc(
 	return ESP_OK;
 }
 
-	const uint16_t length = 1;
-	uint8_t data[length];
-	PASS_ERROR(rfrid_write_register_datastream(handle, FIFO_DATA_REG, data, length), "");
 esp_err_t mrfc522_calculate_crc(
 	spi_device_handle_t* handle, uint8_t* data_to_calculate_crc,
 	const uint16_t length, uint8_t* result
@@ -125,7 +121,7 @@ esp_err_t mrfc522_calculate_crc(
 			"Unable to read register"
 		);
 		// If the IRq fired, don't wait needlessly, break out
-		if (irq_buffer[0] & 0x04) {
+		if (irq_buffer[0] & 0x03) {
 			break;
 		}
 		// Wait before retrying
@@ -147,14 +143,41 @@ esp_err_t mrfc522_calculate_crc(
 	return ESP_OK;
 }
 
+esp_err_t mrfc522_read_mifare(
+	spi_device_handle_t* handle, uint8_t block_address, uint8_t* buffer,
+	uint16_t buffer_size
+) {
+	// First byte is the command (1 byte)
+	// Then the arguments (block_address (1 byte) & crc (2 bytes))
+	// The following 16 bytes will be filled with the returned data
+	// The last 4 bits, a NAC is returned
+	buffer[0] = MIFARE_READ;
+	buffer[1] = block_address;
+	// Calculate the CRC over the command & address
+	PASS_ERROR(
+		mrfc522_calculate_crc(handle, buffer, 2, buffer + 2),
+		"Unable to calculate CRC"
+	);
+	// Send the transceive request
+	return mrfc522_transceive_picc(handle, buffer, 4, buffer, buffer_size);
+}
+
 esp_err_t mrfc522_enable_antenna(spi_device_handle_t* handle) {
 	const uint16_t length = 1;
 	rfid_pcd_register_t target_register[length];
 	uint8_t response[length];
 	target_register[0] = TX_CONTROL_REG;
-	PASS_ERROR(rfid_read_registers(handle, target_register, response, length), "Unable to read from TxControlReg");
+	PASS_ERROR(
+		rfid_read_registers(handle, target_register, response, length),
+		"Unable to read from TxControlReg"
+	);
 	if (!(response[0] & ANTENNA_CONTROL_MASK)) {
-		PASS_ERROR(rfid_write_register(handle, TX_CONTROL_REG, response[0] | ANTENNA_CONTROL_MASK), "Unable to write to TxControlReg");
+		PASS_ERROR(
+			rfid_write_register(
+				handle, TX_CONTROL_REG, response[0] | ANTENNA_CONTROL_MASK
+			),
+			"Unable to write to TxControlReg"
+		);
 	}
 	return ESP_OK;
 }
@@ -164,30 +187,69 @@ esp_err_t mrfc522_disable_antenna(spi_device_handle_t* handle) {
 	rfid_pcd_register_t target_register[length];
 	uint8_t response[length];
 	target_register[0] = TX_CONTROL_REG;
-	PASS_ERROR(rfid_read_registers(handle, target_register, response, length), "Unable to read from TxControlReg");
+	PASS_ERROR(
+		rfid_read_registers(handle, target_register, response, length),
+		"Unable to read from TxControlReg"
+	);
 	if (response[0] & ANTENNA_CONTROL_MASK) {
-		PASS_ERROR(rfid_write_register(handle, TX_CONTROL_REG, response[0] & (~ANTENNA_CONTROL_MASK)), "Unable to write to TxControlReg");
+		PASS_ERROR(
+			rfid_write_register(
+				handle, TX_CONTROL_REG, response[0] & (~ANTENNA_CONTROL_MASK)
+			),
+			"Unable to write to TxControlReg"
+		);
 	}
 	return ESP_OK;
 }
 
 esp_err_t mrfc522_init(spi_device_handle_t* handle) {
 	// Reset registers
-	PASS_ERROR(rfid_write_register(handle, TX_MODE_REG, 0x00), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, RX_MODE_REG, 0x00), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, MOD_WIDTH_REG, 0x00), "Unable to init MRFC522");
+	PASS_ERROR(
+		rfid_write_register(handle, TX_MODE_REG, 0x00), "Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, RX_MODE_REG, 0x00), "Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, MOD_WIDTH_REG, 0x00),
+		"Unable to init MRFC522"
+	);
 
 	// Configure timer
-	PASS_ERROR(rfid_write_register(handle, T_MODE_REG, 0x80), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, T_PRESCALER_REG, 0xa9), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, T_RELOAD_REG_H, 0x03), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, T_RELOAD_REG_L, 0xe8), "Unable to init MRFC522");
+	PASS_ERROR(
+		rfid_write_register(handle, T_MODE_REG, 0x80), "Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, T_PRESCALER_REG, 0xa9),
+		"Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, T_RELOAD_REG_H, 0x03),
+		"Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, T_RELOAD_REG_L, 0xe8),
+		"Unable to init MRFC522"
+	);
 
-	PASS_ERROR(rfid_write_register(handle, TX_ASK_REG, 0x40), "Unable to init MRFC522");
-	PASS_ERROR(rfid_write_register(handle, MODE_REG, 0x3d), "Unable to init MRFC522");
+	PASS_ERROR(
+		rfid_write_register(handle, TX_ASK_REG, 0x40), "Unable to init MRFC522"
+	);
+	PASS_ERROR(
+		rfid_write_register(handle, MODE_REG, 0x3d), "Unable to init MRFC522"
+	);
 
-	mrfc522_fifo_transaction(handle);
+	// Enable the antenna
+	mrfc522_enable_antenna(handle);
+
+	uint8_t buffer[64] = {0};
+	mrfc522_read_mifare(handle, 4, buffer, 64);
+
+	LOG("SUCCES:");
+	for (uint8_t i = 0; i < 64; i++) {
+		LOG("\t%x", buffer[i]);
+	}
+	LOG("END");
 
 	return ESP_OK;
 }
-

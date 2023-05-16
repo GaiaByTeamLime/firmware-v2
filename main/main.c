@@ -32,17 +32,18 @@ void app_main(void) {
 	// mrfc522_init(&rfid_handle);
 
 	LOG("START");
+	mrfc522_init(&rfid_handle);
 	// rfid_pcd_register_t registers[3] = { MODE_REG, TX_CONTROL_REG, TX_SEL_REG };
 	// uint8_t result[3];
 	// LOG("PRE-READ");
 	// rfid_read_registers(&rfid_handle, registers, result, 3);
 	// LOG("-> 0x%02x 0x%02x 0x%02x", result[0], result[1], result[2]);
 
-	LOG("SENDING BYTES");
-	uint8_t banana[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05 };
+	// LOG("SENDING BYTES");
+	// uint8_t banana[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05 };
 	
 	// spi_send_byte(&rfid_handle, 0xae);
-	rfrid_write_register_datastream(&rfid_handle, FIFO_DATA_REG, banana, 6);
+	// rfid_write_register_datastream(&rfid_handle, FIFO_DATA_REG, banana, 6);
 	// rfid_write_register(&rfid_handle, MODE_REG, 0xae);
 
 	// LOG("READ 2");
