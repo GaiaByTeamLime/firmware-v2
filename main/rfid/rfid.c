@@ -49,6 +49,28 @@ esp_err_t rfid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_r
 	return ESP_OK;
 }
 
+esp_err_t rfid_read_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* output_stream, const uint16_t length) {
+	uint8_t write_stream[length + 1], shifted_buffer[length + 1];
+	write_stream[length] = 0; // Add one extra to get the final byte
+	for (uint16_t index = 1; index < length + 1; index++) {
+		write_stream[index] = reg | 0x80; // Read the register (0x80)
+	}
+
+	spi_transaction_t transaction = {0};
+	transaction.tx_buffer = write_stream;
+	transaction.rx_buffer = shifted_buffer;
+	transaction.length = (length + 1) * 8;
+
+	PASS_ERROR(spi_device_transmit(*handle, &transaction), "Unable to transmit data");
+
+	// The output buffer is shifted by 1, this corrects that error
+	for (uint8_t index = 1; index < length + 1; index++) {
+		output_stream[index - 1] = shifted_buffer[index];
+	}
+
+	return ESP_OK;
+}
+
 esp_err_t rfid_read_registers(
 	spi_device_handle_t* handle, const rfid_pcd_register_t* registers,
 	uint8_t* buffer, const uint16_t length
