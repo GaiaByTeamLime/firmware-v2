@@ -32,10 +32,8 @@ esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
 esp_err_t spi_send_bytes(
 	spi_device_handle_t* handle, const uint8_t* data, const uint16_t length
 ) {
-	spi_transaction_t transaction = {0};
-
-	transaction.tx_buffer = &data;
-	transaction.length = length * 8;
-
-	return spi_device_transmit(*handle, &transaction);
+	for (uint16_t index = 0; index < length; index++) {
+		PASS_ERROR(spi_send_byte(handle, data[index]), "Failed sending single byte");
+	}
+	return ESP_OK;
 }
