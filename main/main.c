@@ -30,7 +30,7 @@ void app_main(void) {
 
 	rfid_pcd_register_t data[1];
 	uint8_t buffer[1];
-	data[0] = MODE_REG | 0x80;
+	data[0] = MODE_REG;
 	rfid_read_registers(&rfid_handle, data, buffer, 1);
 	LOG("-> 0x%02x", buffer[0]);
 
