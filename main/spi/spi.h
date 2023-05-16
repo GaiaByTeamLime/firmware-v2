@@ -44,4 +44,6 @@ esp_err_t spi_send_bytes(spi_device_handle_t* handle, const uint8_t* data, const
  */
 esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data);
 
+esp_err_t spi_send_word(spi_device_handle_t* handle, const uint8_t low, const uint8_t high);
+
 #endif

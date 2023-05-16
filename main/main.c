@@ -28,8 +28,18 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
+	LOG("START");
 	rfid_pcd_register_t registers[3] = { MODE_REG, TX_CONTROL_REG, TX_SEL_REG };
 	uint8_t result[3];
+	LOG("PRE-READ");
+	rfid_read_registers(&rfid_handle, registers, result, 3);
+	LOG("-> 0x%02x 0x%02x 0x%02x", result[0], result[1], result[2]);
+
+	LOG("SENDING BYTES");
+	spi_send_word(&rfid_handle, MODE_REG, 0x3e);
+	// spi_send_byte(&rfid_handle, 0x3e);
+
+	LOG("READ 2");
 	rfid_read_registers(&rfid_handle, registers, result, 3);
 	LOG("-> 0x%02x 0x%02x 0x%02x", result[0], result[1], result[2]);
 
