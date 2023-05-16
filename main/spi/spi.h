@@ -28,14 +28,6 @@ esp_err_t spi2_init();
 esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data);
 
 /**
- * Read a byte from SPI
- * 
- * @param handle The SPI Device handle to send the bytes to
- * @param data The byte you want to the to the device
- */
-esp_err_t spi_read_byte(spi_device_handle_t* handle, const uint8_t data);
-
-/**
  * Send a word (2-bytes) over SPI
  *
  * @param handle The SPI Device handle to send the byte to

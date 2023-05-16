@@ -29,7 +29,7 @@ esp_err_t rfid_write_register(
 	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data
 );
 
-esp_err_t rfrid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream, const uint16_t length);
+esp_err_t rfid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream, const uint16_t length);
 
 /**
  * Send a command to the RC522

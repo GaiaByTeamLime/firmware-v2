@@ -39,7 +39,7 @@ rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command) {
 	return rfid_write_register(handle, COMMAND_REG, command);
 }
 
-esp_err_t rfrid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream, const uint16_t length) {
+esp_err_t rfid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream, const uint16_t length) {
 	uint8_t stream[length + 1];
 	stream[0] = reg;
 	for (uint16_t index = 1; index < length + 1; index++) {
