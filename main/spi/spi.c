@@ -36,12 +36,12 @@ esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
 	return spi_device_transmit(*handle, &transaction);
 }
 
-esp_err_t spi_send_word(spi_device_handle_t* handle, const uint8_t low, const uint8_t high) {
+esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word) {
 	uint8_t tx_buffer[2] = {0};
 	uint8_t rx_buffer[2] = {0};
 
-	tx_buffer[0] = low;
-	tx_buffer[1] = high;
+	tx_buffer[0] = word >> 8;
+	tx_buffer[1] = word;
 
 	spi_transaction_t transaction = {0};
 	transaction.tx_buffer = tx_buffer;
@@ -51,11 +51,3 @@ esp_err_t spi_send_word(spi_device_handle_t* handle, const uint8_t low, const ui
 	return spi_device_transmit(*handle, &transaction);
 }
 
-esp_err_t spi_send_bytes(
-	spi_device_handle_t* handle, const uint8_t* data, const uint16_t length
-) {
-	for (uint16_t index = 0; index < length; index++) {
-		PASS_ERROR(spi_send_byte(handle, data[index]), "Failed sending single byte");
-	}
-	return ESP_OK;
-}

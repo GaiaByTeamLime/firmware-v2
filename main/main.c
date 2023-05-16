@@ -36,7 +36,7 @@ void app_main(void) {
 	LOG("-> 0x%02x 0x%02x 0x%02x", result[0], result[1], result[2]);
 
 	LOG("SENDING BYTES");
-	rfid_send_register(&rfid_handle, MODE_REG, 0x3e);
+	rfid_send_register(&rfid_handle, MODE_REG, 0x3f);
 
 	LOG("READ 2");
 	rfid_read_registers(&rfid_handle, registers, result, 3);

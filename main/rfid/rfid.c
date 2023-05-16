@@ -31,7 +31,7 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 esp_err_t rfid_send_register(
 	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t data
 ) {
-	return spi_send_word(handle, reg, data);
+	return spi_send_word(handle, reg << 8 | data);
 }
 
 esp_err_t
