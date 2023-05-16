@@ -25,6 +25,14 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	return ESP_OK;
 }
 
+// NFC Todo:
+//	1. Wake the PICC up
+//	2. Select PICC
+//	3. Do anti-collision
+//	4. Now we can READ
+//
+//	Current issue: we just straight up wanna read from an inactive device
+
 void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
