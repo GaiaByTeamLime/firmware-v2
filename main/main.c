@@ -28,11 +28,10 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	rfid_pcd_register_t data[1];
-	uint8_t buffer[1];
-	data[0] = MODE_REG;
-	rfid_read_registers(&rfid_handle, data, buffer, 1);
-	LOG("-> 0x%02x", buffer[0]);
+	rfid_pcd_register_t registers[3] = { MODE_REG, TX_CONTROL_REG, TX_SEL_REG };
+	uint8_t result[3];
+	rfid_read_registers(&rfid_handle, registers, result, 3);
+	LOG("-> 0x%02x 0x%02x 0x%02x", result[0], result[1], result[2]);
 
 	// while (1) {
 	// 	pull_latest_data();
