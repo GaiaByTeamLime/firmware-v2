@@ -47,13 +47,12 @@
 #define ELOG(...) /* */
 #endif
 
+#ifdef DEBUG
 /**
  * Check if the code errors, if so, return from the parent function and pass the
  * error along This define should ONLY be used in functions whose return type is
  * of esp_err_t, it WILL cause issues if this is not the case. If DEBUG is
  * defined, it will also output the error to the console
- *
- * TODO: Make this not convert to the name if DEBUG is defined
  *
  * @param code The function which needs to be checked
  * @param error_msg The error message to be added to the DEBUG log if the
@@ -68,5 +67,23 @@
 			return err; \
 		} \
 	}
-
+#else
+/**
+ * Check if the code errors, if so, return from the parent function and pass the
+ * error along This define should ONLY be used in functions whose return type is
+ * of esp_err_t, it WILL cause issues if this is not the case. If DEBUG is
+ * defined, it will also output the error to the console
+ *
+ * @param code The function which needs to be checked
+ * @param error_msg The error message to be added to the DEBUG log if the
+ * function returns an error
+ */
+#define PASS_ERROR(code, error_msg) \
+	{ \
+		esp_err_t err = (code); \
+		if ((err) != ESP_OK) { \
+			return err; \
+		} \
+	}
+#endif
 #endif
