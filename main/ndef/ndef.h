@@ -10,7 +10,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t* raw_data;
-	const uint16_t raw_data_length;
+	uint16_t raw_data_length;
 	uint8_t* pointer;
 	ndef_record_t* records;
 	uint8_t record_count;
@@ -29,6 +29,12 @@ typedef struct {
  *  - ???
  */
 #define SKIP_BYTES 5
+
+/**
+ * How many bytes there are in the tag. Bad things happen if this value isn't set properly.
+ * For the MiFare Ultralight C3, the proper value is 144
+ */
+#define MAX_BYTE_COUNT 144
 
 #define TLV_NDEF_MESSAGE 0x03
 #define TLV_TERMINATE 0xfe

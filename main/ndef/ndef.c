@@ -74,14 +74,29 @@ esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
 	return ESP_OK;
 }
 
-tag_data_t ndef_create_type(uint8_t* raw_data, ndef_record_t* records) {
+tag_data_t ndef_create_type() {
+	uint8_t* data_ptr = (uint8_t*)malloc(MAX_BYTE_COUNT);
 	return (tag_data_t){
-		.raw_data = raw_data,
-		.raw_data_length = 144,
-		.pointer = raw_data,
-		.records = records,
-		.record_count = 2
+		.raw_data = data_ptr,
+		.raw_data_length = MAX_BYTE_COUNT,
+		.pointer = data_ptr,
+		.records = NULL,
+		.record_count = 0
 	};
+}
+
+void ndef_destroy_type(tag_data_t* tag) {
+	if (tag->raw_data != NULL) {
+		free(tag->raw_data);
+	}
+	if (tag->records != NULL) {
+		free(tag->records);
+	}
+	tag->record_count = 0;
+	tag->raw_data_length = 0;
+	tag->raw_data = NULL;
+	tag->records = NULL;
+	tag->pointer = NULL;
 }
 
 esp_err_t test(spi_device_handle_t* handle) {
