@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "ndef.h"
+#include "prelude.h"
 
 char represent_byte(uint8_t byte) {
 	if ((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
@@ -97,6 +98,19 @@ void ndef_destroy_type(tag_data_t* tag) {
 	tag->raw_data = NULL;
 	tag->records = NULL;
 	tag->pointer = NULL;
+}
+
+uint8_t ndef_move_to_nearest_tlv(tag_data_t* tag) {
+	// If we're still at the start of the data tag, then skip the first few bytes
+	if (tag->pointer == tag->raw_data) {
+		tag->pointer += SKIP_BYTES;
+	}
+
+	uint8_t tlv_type = TLV_NULL;
+	while (tlv_type == TLV_NULL) {
+		tlv_type = *(tag->pointer++);
+	}
+	return *(tag->pointer++);
 }
 
 esp_err_t test(spi_device_handle_t* handle) {
