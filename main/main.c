@@ -1,16 +1,31 @@
-
 #include "prelude.h"
 
-#include "wifi/wifi.h"
+#include "adc/adc.h"
 
-esp_err_t on_wifi_connect(void) {
-	LOG("Yay we connected!");
-	return ESP_OK;
-}
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 void app_main(void) {
-	LOG("Init");
+	int index = 0;
 
-	wifi_init(&on_wifi_connect);
-	wifi_start("TestSpot", "baguette");
+	esp_err_t message = adc_init();
+	if (message != ESP_OK)
+	{
+		while (1)
+		{
+			LOG("ADC1 Init Error");
+		}
+	}
+
+	while (1) {
+		pull_latest_data();
+		uint32_t adc_data;
+		message = get_adc_data(ADC1_LDR, &adc_data);
+		if (message == ESP_OK)
+		{
+			LOG("LDR Data: %lu", adc_data);
+		}
+		LOG("Test! %d", index++);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
 }
