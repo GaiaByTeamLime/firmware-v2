@@ -8,3 +8,4 @@ API Reference
     persistent_storage.rst
     spi.rst
     rfid.rst
+    wifi.rst

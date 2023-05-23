@@ -1,3 +1,4 @@
+
 #include "prelude.h"
 
 #include "adc/adc.h"
@@ -5,12 +6,19 @@
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
+#include "wifi/wifi.h"
 
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+
+
+esp_err_t on_wifi_connect(void) {
+	LOG("Yay we connected!");
+	return ESP_OK;
+}
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
@@ -25,6 +33,7 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 }
 
 void app_main(void) {
+
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
@@ -63,4 +72,8 @@ void app_main(void) {
 	// 	LOG("Test! %d", index++);
 	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	// }
+	LOG("Init");
+
+	wifi_init(&on_wifi_connect);
+	wifi_start("TestSpot", "baguette");
 }
