@@ -28,6 +28,31 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
+	// Wake up the rfid reader
+	rfid_wakeup_mifare_tag(&rfid_handle);
+
+	// Read actual data from the tag
+	uint8_t buffer[16] = {0};
+	rfid_read_mifare_tag(&rfid_handle, 4, buffer, 16);
+
+	// Output the data
+	LOG("SUCCES:");
+	for (uint8_t i = 0; i < 16; i++) {
+		LOG("\t%x (%c)", buffer[i], buffer[i]);
+	}
+	LOG("END");
+
+	// Read actual data from the tag
+	rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
+
+	// Output the data
+	LOG("SUCCES:");
+	for (uint8_t i = 0; i < 16; i++) {
+		LOG("\t%x (%c)", buffer[i], buffer[i]);
+	}
+	LOG("END");
+
+
 	// while (1) {
 	// 	pull_latest_data();
 	// 	uint32_t adc_data;

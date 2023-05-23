@@ -243,8 +243,7 @@ esp_err_t rfid_calculate_crc(
 	// getting the 2nd element in that array We do the same for the result, we
 	// take the base address, then add +0 or 1 and we get the destination
 	// pointer
-	rfid_read_registers(handle, registers + 1, result, 1);
-	rfid_read_registers(handle, registers + 2, result + 1, 1);
+	rfid_read_registers(handle, registers + 1, result, 2);
 	return ESP_OK;
 }
 
@@ -265,9 +264,7 @@ esp_err_t rfid_read_mifare_tag(
 	);
 	// Send the transceive request
 	const uint8_t framing = 0x00;
-	return rfid_transceive(
-		handle, buffer, 4, buffer, buffer_size, framing
-	);
+	return rfid_transceive(handle, buffer, 4, buffer, buffer_size, framing);
 }
 
 esp_err_t rfid_wakeup_mifare_tag(spi_device_handle_t* handle) {
@@ -276,16 +273,16 @@ esp_err_t rfid_wakeup_mifare_tag(spi_device_handle_t* handle) {
 	const uint8_t valid_bits = 7;
 
 	// Make sure the device is in READY mode
-	while (rfid_transceive(handle, command, 1, buffer, 2, valid_bits) !=
-		   ESP_OK) {
+	while (rfid_transceive(handle, command, 1, buffer, 2, valid_bits) != ESP_OK
+	) {
 		LOG("Unable to wake up reader, trying again");
 	}
 
 	// Make a read at address 0x00, this will make the MiFare tag skip the
 	// anti-collision logic and allow us to read straight from the tag.
-	uint8_t empty_buff[18] = {0};
+	uint8_t empty_buff[16] = {0};
 	PASS_ERROR(
-		rfid_read_mifare_tag(handle, 0, empty_buff, 18),
+		rfid_read_mifare_tag(handle, 0, empty_buff, 16),
 		"Unable to wake-up device"
 	);
 
@@ -381,31 +378,5 @@ esp_err_t rfid_init(spi_device_handle_t* handle) {
 	);
 
 	// Enable the antenna
-	rfid_enable_antenna(handle);
-
-	// Wake up the rfid reader
-	rfid_wakeup_mifare_tag(handle);
-
-	// Read actual data from the tag
-	uint8_t buffer[18] = {0};
-	rfid_read_mifare_tag(handle, 4, buffer, 18);
-
-	// Output the data
-	LOG("SUCCES:");
-	for (uint8_t i = 0; i < 18; i++) {
-		LOG("\t%x (%c)", buffer[i], buffer[i]);
-	}
-	LOG("END");
-
-	// Read actual data from the tag
-	rfid_read_mifare_tag(handle, 4 + 4, buffer, 18);
-
-	// Output the data
-	LOG("SUCCES:");
-	for (uint8_t i = 0; i < 18; i++) {
-		LOG("\t%x (%c)", buffer[i], buffer[i]);
-	}
-	LOG("END");
-
-	return ESP_OK;
+	return rfid_enable_antenna(handle);
 }
