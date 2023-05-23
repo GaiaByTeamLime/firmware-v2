@@ -10,9 +10,19 @@ indent_style = tab
 indent_size = 4
 charset = utf-8
 
+[*.rst]
+indent_style = space
+indent_size = 4
+charset = utf-8
+
 [*.py]
 indent_style = space
 indent_size = 4
+charset = utf-8
+
+[*.yml]
+indent_style = space
+indent_size = 2
 charset = utf-8
 
 [Makefile]

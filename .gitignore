@@ -4,6 +4,7 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+!docs/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -13,5 +14,8 @@ sdkconfig
 sdkconfig.old
 build
 .ccls
+.cache
 **/venv/
 .vscode/
+**/_build/
+**/doxygen_out/
