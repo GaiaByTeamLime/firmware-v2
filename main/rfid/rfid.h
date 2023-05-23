@@ -29,7 +29,7 @@ esp_err_t rfid_write_register(
 
 /**
  * Write an array of data to a single register, the inverse of
- * `rfid_write_register_datastream`. This function is mainly used to write data
+ * `rfid_read_register_datastream`. This function is mainly used to write data
  * to the FIFO data register.
  *
  * @param handle The SPI device handle
@@ -167,7 +167,7 @@ esp_err_t rfid_wakeup_mifare_tag(spi_device_handle_t* handle);
  * `rfid_enable_antenna` function. You do not need to manually call this.
  *
  * If a tag is placed on the reader, the tag will be set to IDLE mode. Thus
- * you need to invoke `rfid_wakeup_mifare_tag` inorder to read any data from
+ * you need to invoke `rfid_wakeup_mifare_tag` in-order to read any data from
  * an MiFare tag.
  *
  * @param The SPI device handle
