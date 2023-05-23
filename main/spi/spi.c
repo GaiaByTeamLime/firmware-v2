@@ -31,7 +31,9 @@ esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data) {
 	return spi_device_transmit(*handle, &transaction);
 }
 
-esp_err_t spi_send_datastream(spi_device_handle_t* handle, const uint8_t* data, const uint16_t length) {
+esp_err_t spi_send_datastream(
+	spi_device_handle_t* handle, const uint8_t* data, const uint16_t length
+) {
 	spi_transaction_t transaction = {0};
 	transaction.tx_buffer = data;
 	transaction.length = length * 8;
@@ -51,4 +53,3 @@ esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word) {
 
 	return spi_device_transmit(*handle, &transaction);
 }
-

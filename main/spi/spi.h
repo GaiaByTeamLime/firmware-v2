@@ -35,6 +35,15 @@ esp_err_t spi_send_byte(spi_device_handle_t* handle, const uint8_t data);
  */
 esp_err_t spi_send_word(spi_device_handle_t* handle, const uint16_t word);
 
-esp_err_t spi_send_datastream(spi_device_handle_t* handle, const uint8_t* data, const uint16_t length);
+/**
+ * Send several bytes of data over via SPI in a single transaction.
+ *
+ * @param handle The SPI handle
+ * @param data The data to send over SPI
+ * @param The length of the data being sent
+ */
+esp_err_t spi_send_datastream(
+	spi_device_handle_t* handle, const uint8_t* data, const uint16_t length
+);
 
 #endif
