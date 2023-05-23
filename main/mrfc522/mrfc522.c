@@ -160,6 +160,22 @@ esp_err_t mrfc522_read_mifare(
 	);
 	// Send the transceive request
 	return mrfc522_transceive_picc(handle, buffer, 4, buffer, buffer_size);
+esp_err_t mrfc522_wakeup(spi_device_handle_t* handle) {
+	uint8_t command[1] = {MIFARE_REQA};
+	uint8_t buffer[2];
+	const uint8_t valid_bits = 7;
+
+	// Make sure the device is in READY mode
+	while (mrfc522_transceive_picc(handle, command, 1, buffer, 2, valid_bits) != ESP_OK) {
+		LOG("Unable to wake up reader, trying again");
+	}
+
+	// Make a read at address 0x00, this will make the MiFare tag skip the
+	// anti-collision logic and allow us to read straight from the tag.
+	uint8_t empty_buff[18] = {0};
+	PASS_ERROR(mrfc522_read_mifare(handle, 0, empty_buff, 18), "Unable to wake-up device");
+
+	return ESP_OK;
 }
 
 esp_err_t mrfc522_enable_antenna(spi_device_handle_t* handle) {
