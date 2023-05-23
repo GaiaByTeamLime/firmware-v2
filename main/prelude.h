@@ -1,6 +1,8 @@
 #ifndef __PRELUDE_HEADER__
 #define __PRELUDE_HEADER__
 
+#include <stdbool.h>
+
 #include <esp_log.h>
 
 // This is kind of reduntent, as the ESP already has log levels internally
