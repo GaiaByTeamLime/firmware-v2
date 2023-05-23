@@ -68,7 +68,7 @@ typedef enum {
 	T_MODE_REG = 0x2A << 1,	  // defines settings for the internal timer
 	T_PRESCALER_REG = 0x2B << 1, // the lower 8 bits of the TPrescaler value.
 								 // The 4 high bits are in TModeReg.
-	T_RELOAD_REG_H = 0x2C << 1, // defines the 16-bit timer reload value
+	T_RELOAD_REG_H = 0x2C << 1,	 // defines the 16-bit timer reload value
 	T_RELOAD_REG_L = 0x2D << 1,
 	T_COUNTER_VALUE_REG_H = 0x2E << 1, // shows the 16-bit timer value
 	T_COUNTER_VALUE_REG_L = 0x2F << 1,

@@ -14,7 +14,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-
 esp_err_t on_wifi_connect(void) {
 	LOG("Yay we connected!");
 	return ESP_OK;
@@ -60,7 +59,6 @@ void app_main(void) {
 		LOG("\t%x (%c)", buffer[i], buffer[i]);
 	}
 	LOG("END");
-
 
 	// while (1) {
 	// 	pull_latest_data();
