@@ -6,7 +6,7 @@
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
-#include "wifi/wifi.h"
+// #include "wifi/wifi.h"
 
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
@@ -103,25 +103,23 @@ void app_main(void) {
 	rfid_wakeup_mifare_tag(&rfid_handle);
 
 	// Read actual data from the tag
-	uint8_t buffer[16] = {0};
-	rfid_read_mifare_tag(&rfid_handle, 4, buffer, 16);
-
-	// Output the data
-	LOG("SUCCES:");
-	for (uint8_t i = 0; i < 16; i++) {
-		LOG("\t%x (%c)", buffer[i], buffer[i]);
+	uint8_t buffer[128] = {0};
+	for (uint8_t sectors = 0; sectors < 8; sectors++) {
+		rfid_read_mifare_tag(
+			&rfid_handle, 4 + sectors * 4, buffer + sectors * 16, 16
+		);
 	}
-	LOG("END");
+	print_buffer(buffer, 128, 4);
 
 	// Read actual data from the tag
-	rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
+	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
 
 	// Output the data
-	LOG("SUCCES:");
-	for (uint8_t i = 0; i < 16; i++) {
-		LOG("\t%x (%c)", buffer[i], buffer[i]);
-	}
-	LOG("END");
+	// LOG("SUCCES:");
+	// for (uint8_t i = 0; i < 16; i++) {
+	// 	LOG("\t%x (%c)", buffer[i], buffer[i]);
+	// }
+	// LOG("END");
 
 	// while (1) {
 	// 	pull_latest_data();
@@ -133,8 +131,7 @@ void app_main(void) {
 	// 	LOG("Test! %d", index++);
 	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	// }
-	LOG("Init");
 
-	wifi_init(&on_wifi_connect);
-	wifi_start("TestSpot", "baguette");
+	// wifi_init(&on_wifi_connect);
+	// wifi_start("TestSpot", "baguette");
 }
