@@ -25,6 +25,8 @@
 #define TIMEOUT_IRQ 0x01
 
 // The only two commands we need
+// There are more commands, but the wakeup command (REQA) and the READ command
+// are the only two we need
 #define MIFARE_READ 0x30
 #define MIFARE_REQA 0x26
 
@@ -177,10 +179,9 @@ esp_err_t rfid_transceive(
 		return ESP_ERR_INVALID_STATE;
 	}
 
-	// Rea back the result!
+	// Read back the result!
 	rfid_read_registers(handle, registers + 2, output_buffer, 1);
 	uint8_t bytes_in_fifo = output_buffer[0];
-	// LOG("Bytes in FIFO: %d", bytes_in_fifo);
 	rfid_read_register_datastream(
 		handle, FIFO_DATA_REG, read_data, bytes_in_fifo
 	);
@@ -230,7 +231,6 @@ esp_err_t rfid_calculate_crc(
 		if (irq_buffer[0] & 0x04) {
 			break;
 		}
-		// Wait before retrying
 		attempts_left--;
 	}
 	// Check if we didn't time out
