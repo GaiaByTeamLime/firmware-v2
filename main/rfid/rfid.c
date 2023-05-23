@@ -52,7 +52,7 @@ esp_err_t rfid_write_register_datastream(spi_device_handle_t* handle, rfid_pcd_r
 esp_err_t rfid_read_register_datastream(spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* output_stream, const uint16_t length) {
 	uint8_t write_stream[length + 1], shifted_buffer[length + 1];
 	write_stream[length] = 0; // Add one extra to get the final byte
-	for (uint16_t index = 1; index < length + 1; index++) {
+	for (uint16_t index = 0; index < length - 1; index++) {
 		write_stream[index] = reg | 0x80; // Read the register (0x80)
 	}
 

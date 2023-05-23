@@ -13,7 +13,7 @@
 #define RFID_SPI_HOST SPI2_HOST
 #define RFID_SPI_MODE 0
 #define RFID_SPI_CS_PIN 10
-#define RFID_SPI_CLK_SPD (1 * 1000 * 1000)
+#define RFID_SPI_CLK_SPD (2 * 1000 * 1000)
 #define RFID_SPI_QUEUE_SIZE 1
 
 esp_err_t rfid_init(spi_device_handle_t* handle);
