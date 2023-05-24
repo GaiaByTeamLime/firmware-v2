@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "ndef.h"
 #include "prelude.h"
@@ -117,10 +118,10 @@ uint8_t ndef_move_to_nearest_tlv(tag_data_t* tag) {
 	return *(tag->pointer++);
 }
 
-esp_err_t test(spi_device_handle_t* handle) {
-	uint8_t raw_buffer[144] = {0};
-	ndef_record_t record_buffer[2] = {0};
-	tag_data_t data = ndef_create_type(raw_buffer, record_buffer);
+bool ndef_is_end_of_tlv(tag_data_t* tag) {
+	return *(tag->pointer) == TLV_TERMINATE;
+}
+
 esp_err_t ndef_parse_record(tag_data_t* tag) {
 	uint8_t record_header = *(tag->pointer++);
 	uint8_t type_length = *(tag->pointer++);
@@ -173,3 +174,36 @@ esp_err_t ndef_parse_record(tag_data_t* tag) {
 	return ESP_OK;
 }
 
+esp_err_t ndef_extract_all_records(spi_device_handle_t* handle, tag_data_t* tag) {
+	// Scan the entire tag
+	PASS_ERROR(ndef_full_scan(handle, tag), "Unable to scan entire tag");
+	// Read all read all NDEF records
+	ndef_move_to_nearest_tlv(tag);
+	while ((!ndef_is_end_of_tlv(tag)) && (tag->record_count < MAX_RECORD_COUNT)) {
+		PASS_ERROR(ndef_parse_record(tag), "Unable to find NDEF record");
+	}
+	return ESP_OK;
+}
+
+esp_err_t test(spi_device_handle_t* handle) {
+	tag_data_t tag = ndef_create_type();
+	PASS_ERROR(ndef_extract_all_records(handle, &tag), "Unable to extract records");
+	print_buffer(tag.raw_data, tag.raw_data_length, 4);
+
+	// Print out all records
+	LOG("Record count: %d", tag.record_count);
+	for (uint8_t record_index = 0; record_index < tag.record_count;
+		 record_index++) {
+		ndef_record_t record = tag.records[record_index];
+		LOG("Record (payload length=%d):", record.payload_size);
+		for (uint8_t byte_index = 0; byte_index < record.payload_size;
+			 byte_index++) {
+			uint8_t data = record.payload[byte_index];
+			LOG("\t0x%02x = %c", data, represent_byte(data));
+		}
+	}
+	LOG("End of records");
+
+	ndef_destroy_type(&tag);
+	return ESP_OK;
+}
