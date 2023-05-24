@@ -57,7 +57,8 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 			uint8_t index = y + x;
 			sprintf(
 				middle_start + (middle_left + middle_right) + line + 2 * x,
-				"%c ", represent_byte(buffer[index])
+				"%c ",
+				represent_byte(buffer[index])
 			);
 		}
 		line[line_width - 2] = '|';
@@ -81,13 +82,12 @@ esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
 
 tag_data_t ndef_create_type() {
 	uint8_t* data_ptr = (uint8_t*)malloc(MAX_BYTE_COUNT);
-	return (tag_data_t){
-		.raw_data = data_ptr,
-		.raw_data_length = MAX_BYTE_COUNT,
-		.pointer = data_ptr,
-		.records = {},
-		.record_count = 0
-	};
+	return (tag_data_t
+	){.raw_data = data_ptr,
+	  .raw_data_length = MAX_BYTE_COUNT,
+	  .pointer = data_ptr,
+	  .records = {},
+	  .record_count = 0};
 }
 
 void ndef_destroy_type(tag_data_t* tag) {
@@ -136,7 +136,8 @@ esp_err_t ndef_parse_record(tag_data_t* tag) {
 	if (type_length != NDEF_TYPE_LENGTH || type_field != NDEF_TYPE_FIELD) {
 		ELOG(
 			"The type length (%d) or the typefield (%02x) is invalid",
-			type_length, type_field
+			type_length,
+			type_field
 		);
 		return ESP_ERR_NOT_SUPPORTED;
 	}
@@ -174,12 +175,15 @@ esp_err_t ndef_parse_record(tag_data_t* tag) {
 	return ESP_OK;
 }
 
-esp_err_t ndef_extract_all_records(spi_device_handle_t* handle, tag_data_t* tag) {
+esp_err_t ndef_extract_all_records(
+	spi_device_handle_t* handle, tag_data_t* tag
+) {
 	// Scan the entire tag
 	PASS_ERROR(ndef_full_scan(handle, tag), "Unable to scan entire tag");
 	// Read all read all NDEF records
 	ndef_move_to_nearest_tlv(tag);
-	while ((!ndef_is_end_of_tlv(tag)) && (tag->record_count < MAX_RECORD_COUNT)) {
+	while ((!ndef_is_end_of_tlv(tag)) && (tag->record_count < MAX_RECORD_COUNT)
+	) {
 		PASS_ERROR(ndef_parse_record(tag), "Unable to find NDEF record");
 	}
 	return ESP_OK;
@@ -187,7 +191,9 @@ esp_err_t ndef_extract_all_records(spi_device_handle_t* handle, tag_data_t* tag)
 
 esp_err_t test(spi_device_handle_t* handle) {
 	tag_data_t tag = ndef_create_type();
-	PASS_ERROR(ndef_extract_all_records(handle, &tag), "Unable to extract records");
+	PASS_ERROR(
+		ndef_extract_all_records(handle, &tag), "Unable to extract records"
+	);
 	print_buffer(tag.raw_data, tag.raw_data_length, 4);
 
 	// Print out all records

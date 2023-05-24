@@ -33,8 +33,8 @@ typedef struct {
 #define SKIP_BYTES 5
 
 /**
- * How many bytes there are in the tag. Bad things happen if this value isn't set properly.
- * For the MiFare Ultralight C3, the proper value is 144
+ * How many bytes there are in the tag. Bad things happen if this value isn't
+ * set properly. For the MiFare Ultralight C3, the proper value is 144
  */
 #define MAX_BYTE_COUNT 144
 
