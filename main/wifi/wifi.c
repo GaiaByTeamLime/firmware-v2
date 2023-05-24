@@ -86,7 +86,10 @@ esp_err_t wifi_init(esp_err_t (*callback)(void)) {
 	// Register events
 	esp_event_handler_instance_t event_wifi_instance, event_ip_instance;
 	esp_event_handler_instance_register(
-		WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL,
+		WIFI_EVENT,
+		ESP_EVENT_ANY_ID,
+		&wifi_event_handler,
+		NULL,
 		&event_wifi_instance
 	);
 	esp_event_handler_instance_register(

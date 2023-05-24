@@ -38,7 +38,9 @@ esp_err_t rfid_write_register(
  * @param length The size of the datastream buffer
  */
 esp_err_t rfid_write_register_datastream(
-	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream,
+	spi_device_handle_t* handle,
+	rfid_pcd_register_t reg,
+	uint8_t* datastream,
 	const uint16_t length
 );
 
@@ -55,8 +57,10 @@ esp_err_t rfid_write_register_datastream(
  * @param length The size of the output_stream buffer
  */
 esp_err_t rfid_read_register_datastream(
-	spi_device_handle_t* handle, rfid_pcd_register_t reg,
-	uint8_t* output_stream, const uint16_t length
+	spi_device_handle_t* handle,
+	rfid_pcd_register_t reg,
+	uint8_t* output_stream,
+	const uint16_t length
 );
 
 /**
@@ -67,8 +71,9 @@ esp_err_t rfid_read_register_datastream(
  * @param handle The SPI device handle
  * @param data The data to set to the register
  */
-esp_err_t
-rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command);
+esp_err_t rfid_send_command(
+	spi_device_handle_t* handle, rfid_pcd_command_t command
+);
 
 /**
  * Read a register from the RFID reader
@@ -81,8 +86,10 @@ rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command);
  * register array size must be the same
  */
 esp_err_t rfid_read_registers(
-	spi_device_handle_t* handle, const rfid_pcd_register_t* registers,
-	uint8_t* buffer, const uint16_t length
+	spi_device_handle_t* handle,
+	const rfid_pcd_register_t* registers,
+	uint8_t* buffer,
+	const uint16_t length
 );
 
 /**
@@ -99,8 +106,11 @@ esp_err_t rfid_read_registers(
  * datasheet for which MiFare commands need how many framing bits
  */
 esp_err_t rfid_transceive(
-	spi_device_handle_t* handle, uint8_t* write_data,
-	const uint16_t write_length, uint8_t* read_data, const uint16_t read_length,
+	spi_device_handle_t* handle,
+	uint8_t* write_data,
+	const uint16_t write_length,
+	uint8_t* read_data,
+	const uint16_t read_length,
 	const uint8_t framing_bits
 );
 
@@ -116,8 +126,10 @@ esp_err_t rfid_transceive(
  * calculated over
  */
 esp_err_t rfid_calculate_crc(
-	spi_device_handle_t* handle, uint8_t* data_to_calculate_crc,
-	const uint16_t length, uint8_t* result
+	spi_device_handle_t* handle,
+	uint8_t* data_to_calculate_crc,
+	const uint16_t length,
+	uint8_t* result
 );
 
 /**
@@ -135,7 +147,9 @@ esp_err_t rfid_calculate_crc(
  * be AT LEAST 16 bytes.
  */
 esp_err_t rfid_read_mifare_tag(
-	spi_device_handle_t* handle, uint8_t block_address, uint8_t* buffer,
+	spi_device_handle_t* handle,
+	uint8_t block_address,
+	uint8_t* buffer,
 	uint16_t buffer_size
 );
 

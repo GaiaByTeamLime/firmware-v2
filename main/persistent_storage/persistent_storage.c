@@ -3,7 +3,9 @@
 esp_err_t persistent_storage_init() { return nvs_flash_init(); }
 
 esp_err_t persistent_storage_set_str(
-	nvs_handle_t* nvs, const char* key, const char* value,
+	nvs_handle_t* nvs,
+	const char* key,
+	const char* value,
 	size_t max_string_length
 ) {
 	char value_buffer[max_string_length + 1]; // +1 for the NULL terminator
