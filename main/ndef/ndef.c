@@ -67,11 +67,14 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 
 esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
 	for (uint8_t sectors = 0; sectors < 9; sectors++) {
-		PASS_ERROR(rfid_read_mifare_tag(
-			handle, 4 + sectors * 4, tag->raw_data + sectors * 16, 16
-		), "Failed reading sector");
+		PASS_ERROR(
+			rfid_read_mifare_tag(
+				handle, 4 + sectors * 4, tag->raw_data + sectors * 16, 16
+			),
+			"Failed reading sector"
+		);
 	}
-	
+
 	return ESP_OK;
 }
 
@@ -81,7 +84,7 @@ tag_data_t ndef_create_type() {
 		.raw_data = data_ptr,
 		.raw_data_length = MAX_BYTE_COUNT,
 		.pointer = data_ptr,
-		.records = NULL,
+		.records = {},
 		.record_count = 0
 	};
 }
@@ -90,18 +93,19 @@ void ndef_destroy_type(tag_data_t* tag) {
 	if (tag->raw_data != NULL) {
 		free(tag->raw_data);
 	}
-	if (tag->records != NULL) {
-		free(tag->records);
+	for (uint8_t record_index = 0; record_index < tag->record_count;
+		 record_index++) {
+		free(tag->records[record_index].payload);
 	}
 	tag->record_count = 0;
 	tag->raw_data_length = 0;
 	tag->raw_data = NULL;
-	tag->records = NULL;
 	tag->pointer = NULL;
 }
 
 uint8_t ndef_move_to_nearest_tlv(tag_data_t* tag) {
-	// If we're still at the start of the data tag, then skip the first few bytes
+	// If we're still at the start of the data tag, then skip the first few
+	// bytes
 	if (tag->pointer == tag->raw_data) {
 		tag->pointer += SKIP_BYTES;
 	}
@@ -117,8 +121,55 @@ esp_err_t test(spi_device_handle_t* handle) {
 	uint8_t raw_buffer[144] = {0};
 	ndef_record_t record_buffer[2] = {0};
 	tag_data_t data = ndef_create_type(raw_buffer, record_buffer);
+esp_err_t ndef_parse_record(tag_data_t* tag) {
+	uint8_t record_header = *(tag->pointer++);
+	uint8_t type_length = *(tag->pointer++);
+	uint8_t payload_length = *(tag->pointer++);
+	uint8_t type_field = *(tag->pointer++);
 
-	ndef_full_scan(handle, &data);
+	// We only support the Well-Known, Text mode, no other
+	if ((record_header & 0x03) != RECORD_TNF_WELL_KNOWN) {
+		ELOG("Record is the wrong type");
+		return ESP_ERR_NOT_SUPPORTED;
+	}
+	if (type_length != NDEF_TYPE_LENGTH || type_field != NDEF_TYPE_FIELD) {
+		ELOG(
+			"The type length (%d) or the typefield (%02x) is invalid",
+			type_length, type_field
+		);
+		return ESP_ERR_NOT_SUPPORTED;
+	}
+
+	// The payload preamble
+	// We have to check if this is valid before continueing
+	if (*(tag->pointer++) != PAYLOAD_STATUS) {
+		ELOG("Record has invalid payload status, must be 0x02");
+		return ESP_ERR_INVALID_STATE;
+	}
+	if (*(tag->pointer++) != PAYLOAD_IANA_MSB) {
+		ELOG("Record has invalid IANA language, must be US-ASCII. (encoded as "
+			 "`en`)");
+		return ESP_ERR_INVALID_STATE;
+	}
+	if (*(tag->pointer++) != PAYLOAD_IANA_LSB) {
+		ELOG("Record has invalid IANA language, must be US-ASCII. (encoded as "
+			 "`en`)");
+		return ESP_ERR_INVALID_STATE;
+	}
+
+	// Re-allocate the memory, as we need to increase the array
+	tag->record_count++;
+	// tag->records = realloc(tag->records, sizeof(ndef_record_t) *
+	// tag->record_count);
+
+	ndef_record_t* record = tag->records + tag->record_count - 1;
+	record->payload = malloc(payload_length - PAYLOAD_PREAMBLE);
+	record->payload_size = payload_length - PAYLOAD_PREAMBLE;
+
+	for (uint8_t index = PAYLOAD_PREAMBLE; index < payload_length; index++) {
+		record->payload[index - PAYLOAD_PREAMBLE] = *(tag->pointer++);
+	}
+
 	return ESP_OK;
 }
 
