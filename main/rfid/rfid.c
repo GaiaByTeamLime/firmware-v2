@@ -36,13 +36,16 @@ esp_err_t rfid_write_register(
 	return spi_send_word(handle, reg << 8 | data);
 }
 
-esp_err_t
-rfid_send_command(spi_device_handle_t* handle, rfid_pcd_command_t command) {
+esp_err_t rfid_send_command(
+	spi_device_handle_t* handle, rfid_pcd_command_t command
+) {
 	return rfid_write_register(handle, COMMAND_REG, command);
 }
 
 esp_err_t rfid_write_register_datastream(
-	spi_device_handle_t* handle, rfid_pcd_register_t reg, uint8_t* datastream,
+	spi_device_handle_t* handle,
+	rfid_pcd_register_t reg,
+	uint8_t* datastream,
 	const uint16_t length
 ) {
 	uint8_t stream[length + 1];
@@ -55,8 +58,10 @@ esp_err_t rfid_write_register_datastream(
 }
 
 esp_err_t rfid_read_register_datastream(
-	spi_device_handle_t* handle, rfid_pcd_register_t reg,
-	uint8_t* output_stream, const uint16_t length
+	spi_device_handle_t* handle,
+	rfid_pcd_register_t reg,
+	uint8_t* output_stream,
+	const uint16_t length
 ) {
 	uint8_t write_stream[length + 1], shifted_buffer[length + 1];
 	write_stream[length] = 0; // Add one extra to get the final byte
@@ -82,8 +87,10 @@ esp_err_t rfid_read_register_datastream(
 }
 
 esp_err_t rfid_read_registers(
-	spi_device_handle_t* handle, const rfid_pcd_register_t* registers,
-	uint8_t* buffer, const uint16_t length
+	spi_device_handle_t* handle,
+	const rfid_pcd_register_t* registers,
+	uint8_t* buffer,
+	const uint16_t length
 ) {
 	rfid_pcd_register_t read_registers[length];
 
@@ -114,8 +121,11 @@ esp_err_t rfid_read_registers(
 }
 
 esp_err_t rfid_transceive(
-	spi_device_handle_t* handle, uint8_t* write_data,
-	const uint16_t write_length, uint8_t* read_data, const uint16_t read_length,
+	spi_device_handle_t* handle,
+	uint8_t* write_data,
+	const uint16_t write_length,
+	uint8_t* read_data,
+	const uint16_t read_length,
 	const uint8_t framing_bits
 ) {
 	PASS_ERROR(
@@ -190,8 +200,10 @@ esp_err_t rfid_transceive(
 }
 
 esp_err_t rfid_calculate_crc(
-	spi_device_handle_t* handle, uint8_t* data_to_calculate_crc,
-	const uint16_t length, uint8_t* result
+	spi_device_handle_t* handle,
+	uint8_t* data_to_calculate_crc,
+	const uint16_t length,
+	uint8_t* result
 ) {
 	// Registers used by read_registers
 	const rfid_pcd_register_t registers[3] = {
@@ -248,7 +260,9 @@ esp_err_t rfid_calculate_crc(
 }
 
 esp_err_t rfid_read_mifare_tag(
-	spi_device_handle_t* handle, uint8_t block_address, uint8_t* buffer,
+	spi_device_handle_t* handle,
+	uint8_t block_address,
+	uint8_t* buffer,
 	uint16_t buffer_size
 ) {
 	// First byte is the command (1 byte)
