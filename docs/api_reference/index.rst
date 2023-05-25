@@ -9,3 +9,4 @@ API Reference
     spi.rst
     rfid.rst
     wifi.rst
+    ndef.rst
