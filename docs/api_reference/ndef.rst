@@ -40,7 +40,5 @@ The Record header explained in greater detail:
  - MB: Message begin
     If this is set, this is the first NDEF record in the NDEF message.
 
-.. doxygenfile:: ndef.c
-    :sections: func
 .. doxygenfile:: ndef.h
-   :sections: define
+   :sections: define func
