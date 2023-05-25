@@ -124,4 +124,3 @@ esp_err_t ndef_extract_all_records(
 	}
 	return ESP_OK;
 }
-
