@@ -3,15 +3,15 @@
 
 #include <esp_err.h>
 
-#define ADC1_PORTS 1
+#define ADC1_PORTS_AMOUNT 1
 
 typedef struct {
 	esp_err_t messageResult;
 	uint32_t data;
 } adc_data_t;
 
-typedef enum {
-	ADC1_LDR = 0,
+typedef enum { //if you add some items, you need to change the ADC1_PORTS_AMOUNT and adc1_ports arrays in adc.c
+	ADC1_LDR, //Port 3
 } adc1_port_t;
 
 esp_err_t adc_init(void);
