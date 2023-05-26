@@ -19,11 +19,6 @@ adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
 	ADC_CHANNEL_3,
 };
 
-/**
- * Initialize ADC1
- *
- * @return esp_err_t
- */
 esp_err_t adc_init(void) {
 	// ADC1 Init
 	adc_oneshot_unit_init_cfg_t init_config1 = {
@@ -62,10 +57,6 @@ esp_err_t adc_init(void) {
 	return ESP_OK;
 }
 
-/**
- * Get the Data from the ADC
- * data is stored in adc_data
- */
 void pull_latest_data(void) {
 	for (uint8_t i = 0; i < ADC1_PORTS_AMOUNT; i++) {
 		adc_result[i].messageResult = adc_oneshot_read(
@@ -76,13 +67,6 @@ void pull_latest_data(void) {
 	}
 }
 
-/**
- * Get the adc data object
- *
- * @param port (which sensordata to get)
- * @param data (pointer to the data)
- * @return esp_err_t
- */
 esp_err_t get_adc_data(adc1_port_t port, uint32_t* data) {
 	PASS_ERROR(adc_result[port].messageResult, "ADC1 Get Data Error");
 	*data = adc_result[port].data;
