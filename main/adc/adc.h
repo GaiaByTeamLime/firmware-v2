@@ -26,7 +26,13 @@ typedef struct {
 	uint32_t data;
 } adc_data_t;
 
-typedef enum { //if you add some items, you need to change the ADC1_PORTS_AMOUNT and adc1_ports arrays in adc.c
+/**
+ * enum to select the adc port
+ * 
+ * @warning if you add some items, you need to change the ADC1_PORTS_AMOUNT and adc1_ports arrays in adc.c
+ * 
+ */
+typedef enum {
 	ADC1_LDR, //Port 3
 } adc1_port_t;
 
