@@ -1,21 +1,21 @@
 
 #include "prelude.h"
 
-#include "adc/adc.h"
-#include "persistent_storage/persistent_storage.h"
-#include "rfid/rfid.h"
-#include "rfid/rfid_pcd_register_types.h"
-#include "spi/spi.h"
-// #include "wifi/wifi.h"
-#include "ndef/ndef.h"
-
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "adc/adc.h"
+#include "ndef/ndef.h"
+#include "persistent_storage/persistent_storage.h"
+#include "rfid/rfid.h"
+#include "rfid/rfid_pcd_register_types.h"
+#include "spi/spi.h"
+#include "wifi/wifi.h"
 char represent_byte(uint8_t byte) {
 	if ((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
 		(byte >= 'A' && byte <= 'Z')) {
