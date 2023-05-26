@@ -3,6 +3,9 @@
 
 #include <esp_err.h>
 
+#define MAX_SSID_LENGTH 32
+#define MAX_PASSWORD_LENGTH 64
+
 /**
  * Setup the entire WiFi driver, register a callback function for
  * when the device connects to a network.
