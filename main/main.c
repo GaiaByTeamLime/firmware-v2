@@ -7,6 +7,7 @@
 #include "spi/spi.h"
 // #include "wifi/wifi.h"
 #include "ndef/ndef.h"
+#include "sensors/sensors.h"
 
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
@@ -90,6 +91,7 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
+	PASS_ERROR(sensors_init(), "Could not initialize sensors");
 
 	return ESP_OK;
 }
@@ -107,30 +109,36 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	// Wake up the rfid reader
-	rfid_wakeup_mifare_tag(&rfid_handle);
+	// // Wake up the rfid reader
+	// rfid_wakeup_mifare_tag(&rfid_handle);
 
-	tag_data_t tag = ndef_create_type();
+	// tag_data_t tag = ndef_create_type();
 
-	ndef_extract_all_records(&rfid_handle, &tag);
+	// ndef_extract_all_records(&rfid_handle, &tag);
 
-	print_buffer(tag.raw_data, tag.raw_data_length, 4);
+	// print_buffer(tag.raw_data, tag.raw_data_length, 4);
 
-	// Print out all records
-	LOG("Record count: %d", tag.record_count);
-	for (uint8_t record_index = 0; record_index < tag.record_count;
-		 record_index++) {
-		ndef_record_t record = tag.records[record_index];
-		LOG("Record (payload length=%d):", record.payload_size);
-		for (uint8_t byte_index = 0; byte_index < record.payload_size;
-			 byte_index++) {
-			uint8_t data = record.payload[byte_index];
-			LOG("\t0x%02x = %c", data, represent_byte(data));
-		}
-	}
-	LOG("End of records");
+	// // Print out all records
+	// LOG("Record count: %d", tag.record_count);
+	// for (uint8_t record_index = 0; record_index < tag.record_count;
+	// 	 record_index++) {
+	// 	ndef_record_t record = tag.records[record_index];
+	// 	LOG("Record (payload length=%d):", record.payload_size);
+	// 	for (uint8_t byte_index = 0; byte_index < record.payload_size;
+	// 		 byte_index++) {
+	// 		uint8_t data = record.payload[byte_index];
+	// 		LOG("\t0x%02x = %c", data, represent_byte(data));
+	// 	}
+	// }
+	// LOG("End of records");
 
-	ndef_destroy_type(&tag);
+	// ndef_destroy_type(&tag);
+
+	// adc_init();
+	// pull_latest_data();
+	// uint32_t data = 0;
+	// get_adc_data(ADC1_LDR, &data);
+	// LOG("%d", (int)data);
 
 	while (1) {
 		pull_latest_data();
