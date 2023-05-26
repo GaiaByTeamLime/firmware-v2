@@ -96,6 +96,27 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 }
 
 void app_main(void) {
+/**
+ * A simple rewrite of memcpy_s.
+ *
+ * It copies over bytes from one byte array to another byte array.
+ *
+ * This function takes in two lengths, the maximum amount of bytes copied over
+ * is the minimum of both lengths.
+ *
+ * @param dest The destination pointer
+ * @param dest_count How many bytes it should write too
+ * @param src The source pointer
+ * @param src_count How many bytes it should copy from
+ */
+void byte_copy(
+	uint8_t* dest, uint8_t dest_count, uint8_t* src, uint8_t src_count
+) {
+	uint8_t max_copy = dest_count < src_count ? dest_count : src_count;
+	for (uint8_t index = 0; index < max_copy; index++) {
+		dest[index] = src[index];
+	}
+}
 
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
