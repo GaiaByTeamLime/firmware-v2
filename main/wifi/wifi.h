@@ -11,11 +11,11 @@
  * when the device connects to a network.
  * At the current moment, we only support WPA2-PSK encryption method
  *
- * @param callback The callback function to be invoked once the device
- * connected to a network
+ * @param success The callback function to be invoked once the device connected to a network
+ * @param failed The callback function to be invoked if the device failed to connect to a network
  * @return Any error the WiFi driver may have encountered
  */
-esp_err_t wifi_init(esp_err_t (*callback)(void));
+esp_err_t wifi_init(void (*success)(void), void (*failed)(void));
 
 /**
  * Start & connect to the WiFi network
