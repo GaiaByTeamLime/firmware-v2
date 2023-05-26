@@ -4,22 +4,22 @@
 #include <esp_event.h>
 #include <esp_netif.h>
 #include <esp_wifi.h>
-#include <nvs_flash.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <nvs_flash.h>
 
 #include "esp_err.h"
 #include "esp_wifi_types.h"
 #include "wifi.h"
 
 void (*wifi_connected_callback)(void);
-void (*wifi_failed_callback)(void);
 
 /**
  * Ugly function, only here to satisfy the function signiture of FreeRTOS
  */
 void on_wifi_connect_task(void* params) {
-	wifi_failed_callback();
+	wifi_connected_callback();
+	vTaskDelete(NULL);
 }
 
 /**
@@ -30,7 +30,14 @@ static void ip_event_handler(
 ) {
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
-		xTaskCreate(&on_wifi_connect_task, "", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
+		xTaskCreate(
+			&on_wifi_connect_task,
+			"OnWifiConnected",
+			configMINIMAL_STACK_SIZE,
+			NULL,
+			tskIDLE_PRIORITY,
+			NULL
+		);
 	}
 }
 
@@ -41,9 +48,9 @@ static void wifi_event_handler(
 	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
 ) {
 	// Just keep retrying on disconnects
-	// wifi_failed_callback();
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
-		// Invoke timer
+		// TODO: Make device go mimimi
+		ELOG("Disconnected, I'm going to cry now");
 	}
 	if (event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
@@ -88,9 +95,8 @@ esp_err_t wifi_start(const char* ssid, const char* password) {
 	return ESP_OK;
 }
 
-esp_err_t wifi_init(void (*success)(void), void (*failed)(void)) {
+esp_err_t wifi_init(void (*success)(void)) {
 	wifi_connected_callback = success;
-	wifi_failed_callback = failed;
 
 	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
 	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
