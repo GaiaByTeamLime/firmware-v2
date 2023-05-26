@@ -79,9 +79,7 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
-void on_wifi_connect(void) {
-	LOG("Yay we connected!");
-}
+void on_wifi_connect(void) { LOG("Yay we connected!"); }
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
@@ -119,10 +117,12 @@ void byte_copy(
 	}
 }
 
-void attempt_wifi_connect(spi_device_handle_t* handle) {
-	rfid_wakeup_mifare_tag(handle);
+esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
+	PASS_ERROR(rfid_wakeup_mifare_tag(handle), "Unable to wake-up MiFare tag");
 	tag_data_t tag = ndef_create_type();
-	ndef_extract_all_records(handle, &tag);
+	PASS_ERROR(
+		ndef_extract_all_records(handle, &tag), "Unable to scan MiFare tag"
+	);
 
 	// Copy over the records
 	uint8_t ssid[MAX_SSID_LENGTH] = {0};
@@ -143,7 +143,11 @@ void attempt_wifi_connect(spi_device_handle_t* handle) {
 	// Destroy the tag
 	ndef_destroy_type(&tag);
 
-	wifi_start((const char*)ssid, (const char*)password);
+	PASS_ERROR(
+		persistent_storage_set_wifi((const char*)ssid, (const char*)password),
+		"Unable to store into persistent storage"
+	);
+	return ESP_OK;
 }
 
 void app_main(void) {
@@ -151,7 +155,11 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	attempt_wifi_connect(&rfid_handle);
+	char ssid[MAX_SSID_LENGTH];
+	char password[MAX_PASSWORD_LENGTH];
+	esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
+	esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
+	LOG("%d %d", persistent_err, cred_err);
 
 	// // Wake up the rfid reader
 	// rfid_wakeup_mifare_tag(&rfid_handle);
