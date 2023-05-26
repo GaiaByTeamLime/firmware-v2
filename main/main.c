@@ -98,6 +98,7 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
+	PASS_ERROR(sensors_init(), "Could not initialize sensors");
 
 	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
 
@@ -155,6 +156,36 @@ void app_main(void) {
 
 	connection_data_t connection_data;
 	persistent_storage_get_connection_data(&connection_data);
+	// // Wake up the rfid reader
+	// rfid_wakeup_mifare_tag(&rfid_handle);
+
+	// tag_data_t tag = ndef_create_type();
+
+	// ndef_extract_all_records(&rfid_handle, &tag);
+
+	// print_buffer(tag.raw_data, tag.raw_data_length, 4);
+
+	// // Print out all records
+	// LOG("Record count: %d", tag.record_count);
+	// for (uint8_t record_index = 0; record_index < tag.record_count;
+	// 	 record_index++) {
+	// 	ndef_record_t record = tag.records[record_index];
+	// 	LOG("Record (payload length=%d):", record.payload_size);
+	// 	for (uint8_t byte_index = 0; byte_index < record.payload_size;
+	// 		 byte_index++) {
+	// 		uint8_t data = record.payload[byte_index];
+	// 		LOG("\t0x%02x = %c", data, represent_byte(data));
+	// 	}
+	// }
+	// LOG("End of records");
+
+	// ndef_destroy_type(&tag);
+
+	// adc_init();
+	// pull_latest_data();
+	// uint32_t data = 0;
+	// get_adc_data(ADC1_LDR, &data);
+	// LOG("%d", (int)data);
 
 	wifi_start(connection_data.ssid, connection_data.password);
 
