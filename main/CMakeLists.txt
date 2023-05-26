@@ -7,6 +7,7 @@ idf_component_register(
         "spi/spi.c"
         "rfid/rfid.c"
         "ndef/ndef.c"
+        "sensors/sensors.c"
     INCLUDE_DIRS
         "."
         "wifi"
@@ -15,6 +16,7 @@ idf_component_register(
         "spi"
         "rfid"
         "ndef"
+        "sensors"
 )
 
 # In release, comment out the below line
