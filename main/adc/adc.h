@@ -5,30 +5,33 @@
 
 /**
  * The amount of ADC ports used
- * 
- * @warning If you add or remove an item from the `adc1_port_t` enum, you need to change this define
+ *
+ * @warning If you add or remove an item from the `adc1_port_t` enum, you need
+ * to change this define
  *
  */
 #define ADC1_PORTS_AMOUNT 1
 
 /**
  * Enum to select the corresponding adc port
- * 
- * @warning If you add or remove an item from this enum, you need to change the ADC1_PORTS_AMOUNT 
- * with the amount of items in this enum. Also, you need to add or remove the corresponding port from
- * the `adc1_ports` array in adc.c. The 0 index of the array is the 0 index of the enum
- * 
+ *
+ * @warning If you add or remove an item from this enum, you need to change the
+ * ADC1_PORTS_AMOUNT with the amount of items in this enum. Also, you need to
+ * add or remove the corresponding port from the `adc1_ports` array in adc.c.
+ * The 0 index of the array is the 0 index of the enum
+ *
  */
 typedef enum {
-	ADC1_LDR, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO only port */
+	ADC1_LDR, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO
+				 only port */
 } adc1_port_t;
 
 /**
  * Struct to store the adc data
- * 
- * @note The data is stored in the `adc_result` array in adc.c. The 0 index of the array is 
- * the 0 index of the enum `adc_result`
- * 
+ *
+ * @note The data is stored in the `adc_result` array in adc.c. The 0 index of
+ * the array is the 0 index of the enum `adc_result`
+ *
  * @param messageResult Result of the operation
  * @param data The data from the ADC
  *
@@ -47,7 +50,7 @@ esp_err_t adc_init(void);
 
 /**
  * Update the Data from the ADC
- * 
+ *
  * @note Data is stored in adc_data
  */
 void pull_latest_data(void);
