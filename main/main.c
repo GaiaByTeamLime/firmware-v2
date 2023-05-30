@@ -104,18 +104,7 @@ void app_main(void) {
 		}
 	}
 
-	while (1) {
-		pull_latest_data();
-		uint32_t adc_data;
-		message = get_adc_data(ADC1_LDR, &adc_data);
-		if (message == ESP_OK) {
-			LOG("LDR Data: %lu", adc_data);
-		}
-		LOG("Test! %d", index++);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-	}
-
-	/* spi_device_handle_t rfid_handle = {0};
+	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
 	// Wake up the rfid reader
@@ -141,8 +130,19 @@ void app_main(void) {
 	}
 	LOG("End of records");
 
-	ndef_destroy_type(&tag); */
+	ndef_destroy_type(&tag);
 
+	while (1) {
+		pull_latest_data();
+		uint32_t adc_data;
+		message = get_adc_data(ADC1_LDR, &adc_data);
+		if (message == ESP_OK) {
+			LOG("LDR Data: %lu", adc_data);
+		}
+		LOG("Test! %d", index++);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	
 	// Read actual data from the tag
 	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
 
