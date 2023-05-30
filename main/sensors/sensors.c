@@ -1,9 +1,19 @@
 #include "sensors.h"
 
-static uint32_t count = 0;
+static uint64_t count = 0;
+static uint64_t prev_count = 0;
+static bool timer_started = false;
+static gptimer_handle_t timer_handle = NULL;
 
 static void interrupt_handler(void* args) {
-	gpio_set_level(GPIO_NUM_0, 1);
+	if (!timer_started) {
+		gptimer_set_raw_count(timer_handle, 0);
+		gptimer_start(timer_handle);
+	} else {
+		gptimer_stop(timer_handle);
+		gptimer_get_raw_count(timer_handle, &count);
+	}
+	timer_started = !timer_started;
 }
 
 esp_err_t capacity_sensor_init() {
@@ -33,8 +43,10 @@ esp_err_t capacity_sensor_init() {
 		.resolution_hz = CAPACITY_SENSOR_GPTIMER_RESOLUTION_HZ,
 		.flags.intr_shared = 0,
 	};
-	gptimer_handle_t timer_handle = NULL;
-	PASS_ERROR(gptimer_new_timer(&timer_config, &timer_handle), "Could not create new timer");
+	PASS_ERROR(
+		gptimer_new_timer(&timer_config, &timer_handle),
+		"Could not create new timer"
+	);
 	PASS_ERROR(gptimer_enable(timer_handle), "Could not enable timer");
 
 	return ESP_OK;
@@ -43,6 +55,15 @@ esp_err_t capacity_sensor_init() {
 esp_err_t sensors_init() {
 	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
+
+	return ESP_OK;
+}
+
+esp_err_t measure_soil_capacity() {
+	if (count != prev_count) {
+		LOG("%d", (int)count);
+	}
+	prev_count = count;
 
 	return ESP_OK;
 }

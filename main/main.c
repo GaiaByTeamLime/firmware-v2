@@ -109,6 +109,11 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
+	while (true) {
+		measure_soil_capacity();
+		vTaskDelay(pdMS_TO_TICKS(50));
+	}
+
 	// // Wake up the rfid reader
 	// rfid_wakeup_mifare_tag(&rfid_handle);
 
