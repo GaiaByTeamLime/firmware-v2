@@ -1,18 +1,19 @@
 
 #include "../prelude.h"
 
+#include <esp_err.h>
 #include <esp_event.h>
+#include <esp_http_client.h>
 #include <esp_netif.h>
 #include <esp_wifi.h>
+#include <esp_wifi_types.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
-#include <esp_err.h>
-#include <esp_wifi_types.h>
-#include <esp_http_client.h>
 
 #include "wifi.h"
 
+bool is_connected = false;
 
 void (*wifi_connected_callback)(void);
 
@@ -32,6 +33,7 @@ static void ip_event_handler(
 ) {
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
+		is_connected = true;
 		xTaskCreate(
 			&on_wifi_connect_task,
 			"OnWifiConnected",
@@ -51,6 +53,7 @@ static void wifi_event_handler(
 ) {
 	// Just keep retrying on disconnects
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
+		is_connected = false;
 		// TODO: Make device go mimimi
 		ELOG("Disconnected, I'm going to cry now");
 	}
@@ -126,3 +129,39 @@ esp_err_t wifi_init(void (*success)(void)) {
 
 	return ESP_OK;
 }
+
+uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
+	char fields[SENSOR_DATA_FIELD_COUNT] = "fihtvHs";
+	char* begin = output;
+
+	*(output++) = '{';
+	for (uint8_t field_index = 0; field_index < SENSOR_DATA_FIELD_COUNT; field_index++) {
+		*(output++) = '"';
+		*(output++) = fields[field_index];
+		*(output++) = '"';
+		*(output++) = ':';
+		// Convert value into a string
+		uint32_t value = sensor_data[field_index];
+
+		// Increment the pointer to the end of the serialised number
+		while (value) {
+			output++;
+			value /= 10;
+		}
+		char* end_of_number = output; // Save the current position for later
+		output--; // Decrement one, now we are at the place the last digit should be placed
+		// Serialise the number, this process starts at the LSB, so we have to move the pointer backwards, otherwise the number is reverted
+		value = sensor_data[field_index];
+		while (value) {
+			*(output--) = '0' + (value % 10);
+			value /= 10;
+		}
+		// Restore the pointer
+		output = end_of_number;
+		*(output++) = ',';
+	}
+	*(--output) = '}';
+	*(++output) = '\0';
+
+	return output - begin + 1;
+};
