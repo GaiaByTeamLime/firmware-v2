@@ -13,13 +13,12 @@
 
 adc_oneshot_unit_handle_t adc1_handle;
 
-adc_data_t adc_result[ADC1_PORTS] = {0};
+adc_data_t adc_result[ADC1_PORTS_AMOUNT] = {0};
 
-/**
- * Initialize ADC1
- *
- * @return esp_err_t
- */
+adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
+	ADC_CHANNEL_3,
+};
+
 esp_err_t adc_init(void) {
 	// ADC1 Init
 	adc_oneshot_unit_init_cfg_t init_config1 = {
@@ -39,9 +38,9 @@ esp_err_t adc_init(void) {
 							 // atten, how higher the input voltage can be
 	};
 
-	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
+	for (uint8_t i = 0; i < ADC1_PORTS_AMOUNT; i++) {
 		PASS_ERROR(
-			adc_oneshot_config_channel(adc1_handle, i, &config),
+			adc_oneshot_config_channel(adc1_handle, adc1_ports[i], &config),
 			"ADC1 channel config failed"
 		);
 	}
@@ -58,26 +57,17 @@ esp_err_t adc_init(void) {
 	return ESP_OK;
 }
 
-/**
- * Get the Data from the ADC
- * data is stored in adc_data
- */
 void pull_latest_data(void) {
-	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
+	for (uint8_t i = 0; i < ADC1_PORTS_AMOUNT; i++) {
 		adc_result[i].messageResult = adc_oneshot_read(
-			adc1_handle, i, (int*)&adc_result[i].data
+			adc1_handle,
+			adc1_ports[i],
+			(int*)&adc_result[i].data
 		); // recommendend, doesn't work in an ISR context
 		   // (instead, use the function adc_oneshot_read_isr())
 	}
 }
 
-/**
- * Get the adc data object
- *
- * @param port (which sensordata to get)
- * @param data (pointer to the data)
- * @return esp_err_t
- */
 esp_err_t get_adc_data(adc1_port_t port, uint32_t* data) {
 	PASS_ERROR(adc_result[port].messageResult, "ADC1 Get Data Error");
 	*data = adc_result[port].data;
