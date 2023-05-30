@@ -77,6 +77,11 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
+esp_err_t on_wifi_connect(void) {
+	LOG("Yay we connected!");
+	return ESP_OK;
+}
+
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
 	PASS_ERROR(
