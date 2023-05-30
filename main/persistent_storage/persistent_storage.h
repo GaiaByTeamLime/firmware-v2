@@ -34,7 +34,9 @@ esp_err_t persistent_storage_init();
  * character array buffer size
  */
 esp_err_t persistent_storage_set_str(
-	nvs_handle_t* nvs, const char* key, const char* value,
+	nvs_handle_t* nvs,
+	const char* key,
+	const char* value,
 	size_t max_string_length
 );
 

@@ -7,4 +7,7 @@ API Reference
     prelude.rst
     adc.rst
     persistent_storage.rst
+    spi.rst
+    rfid.rst
     wifi.rst
+    ndef.rst

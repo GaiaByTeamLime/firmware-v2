@@ -4,11 +4,17 @@ idf_component_register(
         "wifi/wifi.c"
         "adc/adc.c"
         "persistent_storage/persistent_storage.c"
+        "spi/spi.c"
+        "rfid/rfid.c"
+        "ndef/ndef.c"
     INCLUDE_DIRS
         "."
         "wifi"
         "adc"
         "persistent_storage"
+        "spi"
+        "rfid"
+        "ndef"
 )
 
 # In release, comment out the below line
