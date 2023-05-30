@@ -142,7 +142,7 @@ void app_main(void) {
 		LOG("Test! %d", index++);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
-	
+
 	// Read actual data from the tag
 	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
 
