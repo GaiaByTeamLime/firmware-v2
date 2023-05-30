@@ -6,10 +6,11 @@
 #include "prelude.h"
 
 esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
-	for (uint8_t sectors = 0; sectors < 9; sectors++) {
+	const uint8_t MAX_BYTES_PER_SECTION = 16;
+	for (uint8_t sectors = 0; sectors < (MAX_BYTE_COUNT / MAX_BYTES_PER_SECTION); sectors++) {
 		PASS_ERROR(
 			rfid_read_mifare_tag(
-				handle, 4 + sectors * 4, tag->raw_data + sectors * 16, 16
+				handle, 4 + sectors * 4, tag->raw_data + sectors * MAX_BYTES_PER_SECTION, MAX_BYTES_PER_SECTION
 			),
 			"Failed reading sector"
 		);
@@ -20,6 +21,10 @@ esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
 
 tag_data_t ndef_create_type() {
 	uint8_t* data_ptr = (uint8_t*)malloc(MAX_BYTE_COUNT);
+	// Clear the array
+	for (uint16_t index = 0; index < MAX_BYTE_COUNT; index++) {
+		data_ptr[index] = 0;
+	}
 	return (tag_data_t
 	){.raw_data = data_ptr,
 	  .raw_data_length = MAX_BYTE_COUNT,

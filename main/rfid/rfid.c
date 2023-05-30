@@ -4,8 +4,21 @@
 #include "../spi/spi.h"
 #include "rfid.h"
 
-// Timer configuration
+/**
+ * How long before the timer times out
+ * Combined with `TIMER_PRESCALAR` this determines the timeout period
+ *
+ * This is currently set to 1000, at a 40kHz frequency, this means the timeout
+ * period is 25ms
+ */
+//#define TIMER_DURATION 0x03e8
 #define TIMER_DURATION 0x03e8
+/**
+ * Timer frequency formula
+ * Freq = 13.56MHz / (2 * TIMER_PRESCALAR + 1)
+ *
+ * Currently it is set at 40 kHz
+ */
 #define TIMER_PRESCALAR 0xa9
 #define TIMER_MODE 0x80
 
@@ -161,18 +174,18 @@ esp_err_t rfid_transceive(
 	rfid_pcd_register_t registers[] = {COM_IRQ_REG, ERROR_REG, FIFO_LEVEL_REG};
 
 	uint16_t attempts_left = 5000;
-	uint8_t output_buffer[1] = {0};
+	uint8_t interrupt_register = 0;
 	while (attempts_left) {
 		PASS_ERROR(
-			rfid_read_registers(handle, registers, output_buffer, 1),
+			rfid_read_registers(handle, registers, &interrupt_register, 1),
 			"Unable to read register"
 		);
 		// If the IRq fired, don't wait needlessly, break out
-		if (output_buffer[0] & DATASTREAM_STOP_IRQ) {
+		if (interrupt_register & DATASTREAM_STOP_IRQ) {
 			break;
 		}
-		if (output_buffer[0] & TIMEOUT_IRQ) {
-			LOG("Timer Timeout");
+		if (interrupt_register & TIMEOUT_IRQ) {
+			ELOG("Timer Timeout");
 			return ESP_ERR_TIMEOUT;
 		}
 		attempts_left--;
@@ -183,17 +196,26 @@ esp_err_t rfid_transceive(
 	}
 
 	// Make sure no weird error happened in the meantime
-	rfid_read_registers(handle, registers + 1, output_buffer, 1);
-	if (output_buffer[0] & INVALID_STATE) {
+	PASS_ERROR(
+		rfid_read_registers(handle, registers + 1, &interrupt_register, 1),
+		"Unable to read error register"
+	);
+	if (interrupt_register & INVALID_STATE) {
 		ELOG("Error during transceive!");
 		return ESP_ERR_INVALID_STATE;
 	}
 
 	// Read back the result!
-	rfid_read_registers(handle, registers + 2, output_buffer, 1);
-	uint8_t bytes_in_fifo = output_buffer[0];
-	rfid_read_register_datastream(
-		handle, FIFO_DATA_REG, read_data, bytes_in_fifo
+	PASS_ERROR(
+		rfid_read_registers(handle, registers + 2, &interrupt_register, 1),
+		"Unable to read bytes in FIFO register"
+	);
+	uint8_t bytes_in_fifo = interrupt_register;
+	PASS_ERROR(
+		rfid_read_register_datastream(
+			handle, FIFO_DATA_REG, read_data, bytes_in_fifo
+		),
+		"Unable to read FIFI data register"
 	);
 
 	return ESP_OK;
