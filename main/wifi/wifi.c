@@ -37,7 +37,7 @@ static void ip_event_handler(
 		xTaskCreate(
 			&on_wifi_connect_task,
 			"OnWifiConnected",
-			configMINIMAL_STACK_SIZE,
+			configMINIMAL_STACK_SIZE + 5000,
 			NULL,
 			tskIDLE_PRIORITY,
 			NULL
