@@ -1,4 +1,3 @@
-
 #include "prelude.h"
 
 #include <driver/spi_common.h>
@@ -151,6 +150,14 @@ esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
 }
 
 void app_main(void) {
+	int index = 0;
+
+	esp_err_t message = adc_init();
+	if (message != ESP_OK) {
+		while (1) {
+			LOG("ADC1 Init Error");
+		}
+	}
 
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
@@ -200,6 +207,17 @@ void app_main(void) {
 	// LOG("End of records");
 	//
 	// ndef_destroy_type(&tag);
+
+	while (1) {
+		pull_latest_data();
+		uint32_t adc_data;
+		message = get_adc_data(ADC1_LDR, &adc_data);
+		if (message == ESP_OK) {
+			LOG("LDR Data: %lu", adc_data);
+		}
+		LOG("Test! %d", index++);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
 
 	// Read actual data from the tag
 	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
