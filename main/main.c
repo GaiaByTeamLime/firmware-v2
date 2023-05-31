@@ -25,7 +25,7 @@ char represent_byte(uint8_t byte) {
 	return '.';
 }
 
-void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
+void print_buffer(uint8_t* buffer, uint16_t size, uint8_t address) {
 	// Output the data
 	const uint8_t width = 4;
 	const uint8_t left_padding = 2;
@@ -55,7 +55,7 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 
 	LOG("+----+-------------+---------+");
 	LOG("|ADDR| BYTES       | CHARS   |");
-	for (uint8_t y = 0; y < size; y += width) {
+	for (uint16_t y = 0; y < size; y += width) {
 		if (y % block_data == 0) {
 			LOG("+----+-------------+---------+");
 		}
@@ -155,11 +155,24 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	char ssid[MAX_SSID_LENGTH];
-	char password[MAX_PASSWORD_LENGTH];
-	esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
+	char ssid[MAX_SSID_LENGTH] = {0};
+	char password[MAX_PASSWORD_LENGTH] = {0};
 	esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
-	LOG("%d %d", persistent_err, cred_err);
+	if (cred_err != ESP_OK) {
+		ELOG("Unable to retrieve store credentials in NVS");
+	}
+	esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
+	if (persistent_err != ESP_OK) {
+		ELOG("Unable to retrieve credentials from NVS");
+	}
+
+	char buffer[SERIALISED_DATA_MAX_BYTES] = {0};
+	uint32_t values[SENSOR_DATA_FIELD_COUNT] = {2, 69, 420, 21, 4000, 202, 30};
+	uint32_t length = wifi_serialise_data(values, buffer);
+	LOG("Serialised sensor data: %" PRIu32 ": %s", length, buffer);
+
+	// Connect to WiFi
+	wifi_start(ssid, password);
 
 	// // Wake up the rfid reader
 	// rfid_wakeup_mifare_tag(&rfid_handle);
@@ -210,5 +223,5 @@ void app_main(void) {
 	// }
 
 	// wifi_init(&on_wifi_connect);
-	// wifi_start("TestSpot", "baguette");
+	// wifi_start("TestSpot", "baguette");main
 }

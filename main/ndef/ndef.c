@@ -15,6 +15,7 @@ esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
 			"Failed reading sector"
 		);
 	}
+	LOG("NDEF Scanned entire PICC device");
 
 	return ESP_OK;
 }
@@ -104,6 +105,7 @@ esp_err_t ndef_parse_record(tag_data_t* tag) {
 
 	// Re-allocate the memory, as we need to increase the array
 	tag->record_count++;
+	LOG("NDEF Parsed %dth NDEF Record", tag->record_count);
 
 	ndef_record_t* record = tag->records + tag->record_count - 1;
 	record->payload = malloc(payload_length - PAYLOAD_PREAMBLE);
@@ -127,5 +129,6 @@ esp_err_t ndef_extract_all_records(
 	) {
 		PASS_ERROR(ndef_parse_record(tag), "Unable to find NDEF record");
 	}
+	LOG("NDEF Exacted All NDEF Records");
 	return ESP_OK;
 }
