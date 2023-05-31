@@ -150,15 +150,6 @@ esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
 }
 
 void app_main(void) {
-	int index = 0;
-
-	esp_err_t message = adc_init();
-	if (message != ESP_OK) {
-		while (1) {
-			LOG("ADC1 Init Error");
-		}
-	}
-
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
@@ -181,65 +172,13 @@ void app_main(void) {
 	// Connect to WiFi
 	wifi_start(ssid, password);
 
-	// // Wake up the rfid reader
-	// rfid_wakeup_mifare_tag(&rfid_handle);
-	//
-	// tag_data_t tag = ndef_create_type();
-	// ndef_extract_all_records(&rfid_handle, &tag);
-	// if (tag.record_count != 4) {
-	// 	ELOG("MiFare tag must contain 4 NDEF records, no less, no more.");
-	// }
-	//
-	// // print_buffer(tag.raw_data, tag.raw_data_length, 4);
-	//
-	// // Print out all records
-	// LOG("Record count: %d", tag.record_count);
-	// for (uint8_t record_index = 0; record_index < tag.record_count;
-	// 	 record_index++) {
-	// 	ndef_record_t record = tag.records[record_index];
-	// 	LOG("Record (payload length=%d):", record.payload_size);
-	// 	for (uint8_t byte_index = 0; byte_index < record.payload_size;
-	// 		 byte_index++) {
-	// 		uint8_t data = record.payload[byte_index];
-	// 		LOG("\t0x%02x = %c", data, represent_byte(data));
-	// 	}
-	// }
-	// LOG("End of records");
-	//
-	// ndef_destroy_type(&tag);
-
 	while (1) {
 		pull_latest_data();
 		uint32_t adc_data;
-		message = get_adc_data(ADC1_LDR, &adc_data);
-		if (message == ESP_OK) {
-			LOG("LDR Data: %lu", adc_data);
+		esp_err_t error_code = get_adc_data(ADC1_LDR, &adc_data);
+		if (error_code == ESP_OK) {
+			LOG("LDR data: %" PRIu32, adc_data);
 		}
-		LOG("Test! %d", index++);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
-
-	// Read actual data from the tag
-	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
-
-	// Output the data
-	// LOG("SUCCES:");
-	// for (uint8_t i = 0; i < 16; i++) {
-	// 	LOG("\t%x (%c)", buffer[i], buffer[i]);
-	// }
-	// LOG("END");
-
-	// while (1) {
-	// 	pull_latest_data();
-	// 	uint32_t adc_data;
-	// 	message = get_adc_data(ADC1_LDR, &adc_data);
-	// 	if (message == ESP_OK) {
-	// 		LOG("LDR Data: %lu", adc_data);
-	// 	}
-	// 	LOG("Test! %d", index++);
-	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	// }
-
-	// wifi_init(&on_wifi_connect);
-	// wifi_start("TestSpot", "baguette");main
 }
