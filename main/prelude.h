@@ -5,6 +5,13 @@
 
 #include <esp_log.h>
 
+/***
+ * the duration of the deep sleep (1 hour). If you want to use the deep sleep,
+ * call the function esp_deep_sleep(SLEEP_DURATION) in your code and include the
+ * esp_sleep.h header file
+ */
+#define SLEEP_DURATION (1ULL * 60 * 60 * 1000 * 1000)
+
 // This is kind of reduntent, as the ESP already has log levels internally
 // Though those are runtime checks, this is removed during compile time
 // Which is preferable
