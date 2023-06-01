@@ -1,6 +1,11 @@
 #ifndef __PRELUDE_HEADER__
 #define __PRELUDE_HEADER__
 
+#define MAX_SSID_LENGTH 32
+#define MAX_PASSWORD_LENGTH 64
+#define SENSOR_ID_LENGTH 27
+#define SENSOR_TOKEN_LENGTH 27
+
 #include <stdbool.h>
 
 #include <esp_log.h>
@@ -96,3 +101,10 @@
 	}
 #endif
 #endif
+
+typedef struct {
+	char* ssid[MAX_SSID_LENGTH + 1];
+	char* password[MAX_PASSWORD_LENGTH + 1];
+	char* sid[SENSOR_ID_LENGTH + 1];
+	char* token[SENSOR_TOKEN_LENGTH + 1];
+} connection_data_t;
