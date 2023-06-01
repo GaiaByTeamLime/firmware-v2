@@ -46,6 +46,10 @@ esp_err_t persistent_storage_set_connection_data(
 	connection_data_t* connection_data
 );
 
+esp_err_t persistent_storage_get_connection_data(
+	connection_data_t* connection_data
+);
+
 /**
  * Erase the default NVS Flash partition
  */
