@@ -13,6 +13,8 @@
 
 #define WIFI_SSID_KEY "WIFI_SSID"
 #define WIFI_PASSWORD_KEY "WIFI_PASSWORD"
+#define SENSOR_ID_KEY "SID"
+#define SENSOR_TOKEN_KEY "STOKEN"
 
 #define WIFI_SSID_MAX_LENGTH 31
 #define WIFI_SSID_CHAR_BUFFER_LENGTH WIFI_SSID_MAX_LENGTH + 1
@@ -40,22 +42,17 @@ esp_err_t persistent_storage_set_str(
 	size_t max_string_length
 );
 
-/**
- * Store the WiFi credentials in Persistent Storage
- *
- * @param ssid The WiFi SSID
- * @param password The WiFi password
- */
-esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password);
+esp_err_t persistent_storage_set_connection_data(
+	connection_data_t* connection_data
+);
+
+esp_err_t persistent_storage_get_connection_data(
+	connection_data_t* connection_data
+);
 
 /**
- * Get WiFi credentials from Persistent Storage
- *
- * @param ssid A character buffer in which the WiFi SSID will be stored. It
- * needs to be at least WIFI_SSID_CHAR_BUFFER_LENGTH long
- * @param password A character buffer in which the WiFi Password will be stored.
- * It needs to be at least WIFI_PASSWORD_CHAR_BUFFER_LENGTH long
+ * Erase the default NVS Flash partition
  */
-esp_err_t persistent_storage_get_wifi(char* ssid, char* password);
+esp_err_t persistent_storage_erase();
 
 #endif

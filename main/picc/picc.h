@@ -1,6 +1,8 @@
 #ifndef _HEADER_PICC_
 #define _HEADER_PICC_
 
+#include "../prelude.h"
+
 /**
  * The maximum length of the network SSID
  */
@@ -12,11 +14,11 @@
 /**
  * The maximum length of the website URL
  */
-#define PICC_URL_LENGTH 27
+#define PICC_SID_LENGTH SENSOR_ID_LENGTH
 /**
  * The maximum length of the token sent to the server
  */
-#define PICC_TOKEN_LENGTH 27
+#define PICC_TOKEN_LENGTH SENSOR_TOKEN_LENGTH
 /**
  * In case the token doesn't reach the max allowed size, then at what character
  * should it stop? This should be a null-byte '\0', but for testing purposes
@@ -40,8 +42,8 @@ void picc_get_ssid(tag_data_t* tag, char* ssid);
  * Extract the password from the tag.
  *
  * @param tag The tag to extract the data from
- * @param password The string to store the password on, the length must be at least
- * `PICC_PASS_LENGTH + 1`
+ * @param password The string to store the password on, the length must be at
+ * least `PICC_PASS_LENGTH + 1`
  */
 void picc_get_password(tag_data_t* tag, char* password);
 /**
@@ -49,9 +51,9 @@ void picc_get_password(tag_data_t* tag, char* password);
  *
  * @param tag The tag to extract the data from
  * @param url The string to store the url on, the length must be at least
- * `PICC_URL_LENGTH + 1`
+ * `PICC_SID_LENGTH + 1`
  */
-void picc_get_url(tag_data_t* tag, char* url);
+void picc_get_sid(tag_data_t* tag, char* url);
 /**
  * Extract the token from an tag.
  *
