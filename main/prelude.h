@@ -8,9 +8,8 @@
 /***
  * the duration of the deep sleep (1 hour)
  */
-#define SLEEP_DURATION \
-	(1ULL * 60 * 60 * 1000 * 1000 \
-	) // call function: esp_deep_sleep(SLEEP_DURATION);
+#define SLEEP_DURATION (1ULL * 60 * 60 * 1000 * 1000)
+// call function: esp_deep_sleep(SLEEP_DURATION); #include <esp_sleep.h>
 
 // This is kind of reduntent, as the ESP already has log levels internally
 // Though those are runtime checks, this is removed during compile time
