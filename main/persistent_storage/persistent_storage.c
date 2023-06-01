@@ -23,7 +23,7 @@ esp_err_t persistent_storage_set_connection_data(
 ) {
 	nvs_handle_t nvs;
 	PASS_ERROR(
-		nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs),
+		nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs),
 		"Failed to open NVS storage"
 	);
 	LOG("NVS Open");
