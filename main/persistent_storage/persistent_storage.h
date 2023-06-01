@@ -43,7 +43,7 @@ esp_err_t persistent_storage_set_str(
 );
 
 esp_err_t persistent_storage_set_connection_data(
-	connection_data_t connection_data
+	connection_data_t* connection_data
 );
 
 /**

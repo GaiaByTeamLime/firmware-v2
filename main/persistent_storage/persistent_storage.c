@@ -19,7 +19,7 @@ esp_err_t persistent_storage_set_str(
 }
 
 esp_err_t persistent_storage_set_connection_data(
-	connection_data_t connection_data
+	connection_data_t* connection_data
 ) {
 	nvs_handle_t nvs;
 	PASS_ERROR(
@@ -30,7 +30,7 @@ esp_err_t persistent_storage_set_connection_data(
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, WIFI_SSID_KEY, connection_data.ssid, WIFI_SSID_MAX_LENGTH
+			&nvs, WIFI_SSID_KEY, connection_data->ssid, WIFI_SSID_MAX_LENGTH
 		),
 		"Failed to write WiFi SSID to storage"
 	);
@@ -40,7 +40,7 @@ esp_err_t persistent_storage_set_connection_data(
 		persistent_storage_set_str(
 			&nvs,
 			WIFI_PASSWORD_KEY,
-			connection_data.password,
+			connection_data->password,
 			WIFI_PASSWORD_MAX_LENGTH
 		),
 		"Failed to write WiFi password to storage"
@@ -49,7 +49,7 @@ esp_err_t persistent_storage_set_connection_data(
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, SENSOR_ID_KEY, connection_data.sid, SENSOR_TOKEN_LENGTH
+			&nvs, SENSOR_ID_KEY, connection_data->sid, SENSOR_TOKEN_LENGTH
 		),
 		"Failed to write sensor ID to storage"
 	);
@@ -57,7 +57,7 @@ esp_err_t persistent_storage_set_connection_data(
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, SENSOR_TOKEN_KEY, connection_data.token, SENSOR_TOKEN_LENGTH
+			&nvs, SENSOR_TOKEN_KEY, connection_data->token, SENSOR_TOKEN_LENGTH
 		),
 		"Failed to write sensor token to storage"
 	);
