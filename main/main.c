@@ -3,6 +3,7 @@
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
+#include <esp_heap_caps.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
@@ -11,6 +12,7 @@
 #include "adc/adc.h"
 #include "ndef/ndef.h"
 #include "persistent_storage/persistent_storage.h"
+#include "picc/picc.h"
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
@@ -78,7 +80,15 @@ void print_buffer(uint8_t* buffer, uint16_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
-void on_wifi_connect(void) { LOG("Yay we connected!"); }
+void on_wifi_connect(void) {
+	connection_data_t connection_data;
+	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
+		// TODO: Enter sleep mode
+	}
+
+	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+	wifi_send_data_to_server(&connection_data, sensor_values);
+}
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
@@ -119,31 +129,19 @@ void byte_copy(
 esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
 	PASS_ERROR(rfid_wakeup_mifare_tag(handle), "Unable to wake-up MiFare tag");
 	tag_data_t tag = ndef_create_type();
-	PASS_ERROR(
-		ndef_extract_all_records(handle, &tag), "Unable to scan MiFare tag"
-	);
+	PASS_ERROR(ndef_full_scan(handle, &tag), "Unable to scan MiFare tag");
 
-	// Copy over the records
-	uint8_t ssid[MAX_SSID_LENGTH] = {0};
-	uint8_t password[MAX_PASSWORD_LENGTH] = {0};
-	byte_copy(
-		ssid,
-		MAX_SSID_LENGTH - 1,
-		tag.records[0].payload,
-		tag.records[0].payload_size
-	);
-	byte_copy(
-		password,
-		MAX_PASSWORD_LENGTH - 1,
-		tag.records[1].payload,
-		tag.records[1].payload_size
-	);
+	connection_data_t connection_data;
+	picc_get_ssid(&tag, connection_data.ssid);
+	picc_get_token(&tag, connection_data.token);
+	picc_get_password(&tag, connection_data.password);
+	picc_get_sid(&tag, connection_data.sid);
 
 	// Destroy the tag
 	ndef_destroy_type(&tag);
 
 	PASS_ERROR(
-		persistent_storage_set_wifi((const char*)ssid, (const char*)password),
+		persistent_storage_set_connection_data(&connection_data),
 		"Unable to store into persistent storage"
 	);
 	return ESP_OK;
@@ -153,32 +151,34 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	char ssid[MAX_SSID_LENGTH] = {0};
-	char password[MAX_PASSWORD_LENGTH] = {0};
-	esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
-	if (cred_err != ESP_OK) {
-		ELOG("Unable to retrieve store credentials in NVS");
-	}
-	esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
-	if (persistent_err != ESP_OK) {
-		ELOG("Unable to retrieve credentials from NVS");
-	}
+	get_and_store_credentials(&rfid_handle);
 
-	char buffer[SERIALISED_DATA_MAX_BYTES] = {0};
-	uint32_t values[SENSOR_DATA_FIELD_COUNT] = {2, 69, 420, 21, 4000, 202, 30};
-	uint32_t length = wifi_serialise_data(values, buffer);
-	LOG("Serialised sensor data: %" PRIu32 ": %s", length, buffer);
+	connection_data_t connection_data;
+	persistent_storage_get_connection_data(&connection_data);
 
-	// Connect to WiFi
-	wifi_start(ssid, password);
+	wifi_start(connection_data.ssid, connection_data.password);
 
-	while (1) {
-		pull_latest_data();
-		uint32_t adc_data;
-		esp_err_t error_code = get_adc_data(ADC1_LDR, &adc_data);
-		if (error_code == ESP_OK) {
-			LOG("LDR data: %" PRIu32, adc_data);
-		}
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-	}
+	// char ssid[MAX_SSID_LENGTH] = {0};
+	// char password[MAX_PASSWORD_LENGTH] = {0};
+	// esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
+	// if (cred_err != ESP_OK) {
+	// 	ELOG("Unable to retrieve store credentials in NVS");
+	// }
+	// esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
+	// if (persistent_err != ESP_OK) {
+	// 	ELOG("Unable to retrieve credentials from NVS");
+	// }
+	//
+	// // Connect to WiFi
+	// wifi_start(ssid, password);
+	//
+	// while (1) {
+	// 	pull_latest_data();
+	// 	uint32_t adc_data;
+	// 	esp_err_t error_code = get_adc_data(ADC1_LDR, &adc_data);
+	// 	if (error_code == ESP_OK) {
+	// 		LOG("LDR data: %" PRIu32, adc_data);
+	// 	}
+	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	// }
 }
