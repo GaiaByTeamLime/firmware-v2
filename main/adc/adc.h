@@ -4,6 +4,7 @@
 #include <esp_err.h>
 
 #define ADC1_PORTS 2
+#define ADC1_PORTS_AMOUNT 2
 
 typedef struct {
 	esp_err_t messageResult;
