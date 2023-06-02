@@ -3,14 +3,7 @@
 
 #include <esp_err.h>
 
-/**
- * The amount of ADC ports used
- *
- * @warning If you add or remove an item from the `adc1_port_t` enum, you need
- * to change this define
- *
- */
-#define ADC1_PORTS_AMOUNT 1
+#define ADC1_PORTS 2
 
 /**
  * Enum to select the corresponding adc port
@@ -41,11 +34,11 @@ typedef struct {
 	uint32_t data;
 } adc_data_t;
 
-/**
- * Initialize ADC1
- *
- * @return Result of the initialization
- */
+typedef enum {
+	ADC1_LDR = 0,
+	ADC1_BAT = 1,
+} adc1_port_t;
+
 esp_err_t adc_init(void);
 
 /**
