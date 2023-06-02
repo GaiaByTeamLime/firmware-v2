@@ -32,10 +32,6 @@ esp_err_t capacity_sensor_init() {
 	PASS_ERROR(
 		gpio_install_isr_service(0), "Could not install GPIO ISR service"
 	);
-	PASS_ERROR(
-		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
-		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
-	);
 
 	gptimer_config_t timer_config = {
 		.clk_src = GPTIMER_CLK_SRC_DEFAULT,
@@ -48,6 +44,10 @@ esp_err_t capacity_sensor_init() {
 		"Could not create new timer"
 	);
 	PASS_ERROR(gptimer_enable(timer_handle), "Could not enable timer");
+	PASS_ERROR(
+		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
+		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
+	);
 
 	return ESP_OK;
 }
