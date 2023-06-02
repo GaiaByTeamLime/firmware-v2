@@ -3,6 +3,8 @@
 
 #include <esp_err.h>
 
+#include "prelude.h"
+
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
 
@@ -12,6 +14,10 @@
 #define BYTES_PER_FIELD (4 + BYTES_PER_NUMBER + 1)
 #define SERIALISED_DATA_MAX_BYTES \
 	(JSON_WRAPPER_BYTES + SENSOR_DATA_FIELD_COUNT * BYTES_PER_FIELD)
+
+#define BASE_DATABASE_URL "https://temporal.dev.gaiaplant.app/log/"
+#define BASE_DATABASE_URL_LENGTH 39 // This is without the null-byte
+#define HEADER_TEXT_LENGTH 7
 
 /**
  * Setup the entire WiFi driver, register a callback function for
@@ -23,6 +29,19 @@
  * @return Any error the WiFi driver may have encountered
  */
 esp_err_t wifi_init(void (*success)(void));
+
+/**
+ * Send sensor data to the sensor database.
+ *
+ * @see wifi_serialise_data
+ *
+ * @param connection_data The configuration data used to connect to the server
+ * @param sensor_values The sensor values, the length of this array must equal
+ * `SENSOR_DATA_FIELD_COUNT`
+ */
+esp_err_t wifi_send_data_to_server(
+	connection_data_t* connection_data, uint32_t* sensor_values
+);
 
 /**
  * Start & connect to the WiFi network
@@ -63,7 +82,8 @@ esp_err_t wifi_start(const char* ssid, const char* password);
  * @param sensor_data A pointer to an array of sensor data
  * @param output A pointer to an output char buffer, the serialised data gets
  * written to here
- * @returns The amount of bytes written to the sensor data array, INCLUDING the NULL-byte
+ * @returns The amount of bytes written to the sensor data array, INCLUDING the
+ * NULL-byte
  */
 uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output);
 

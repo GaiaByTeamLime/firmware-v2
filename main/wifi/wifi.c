@@ -1,6 +1,8 @@
 
 #include "../prelude.h"
 
+#include <esp_crt_bundle.h>
+#include <esp_http_client.h>
 #include <esp_err.h>
 #include <esp_event.h>
 #include <esp_http_client.h>
@@ -13,6 +15,7 @@
 #include <nvs_flash.h>
 
 #include "wifi.h"
+#include "picc.h"
 
 bool is_connected = false;
 
@@ -62,6 +65,66 @@ static void wifi_event_handler(
 		esp_wifi_connect();
 	}
 }
+
+esp_err_t http_event_handle(esp_http_client_event_t* handle) { 
+	char str[handle->data_len + 1];
+	for (uint8_t i = 0; i < handle->data_len; i++) {
+		str[i] = *(((char*)handle->data) + i);
+	}
+	str[handle->data_len] = '\0';
+	LOG("\n%s", str);
+	return ESP_OK; }
+
+/**
+ * Same as the standard C strcpy, except it interates the pointer, making it
+ * suitable to concatenate several strings.
+ *
+ * @warning This function does *not* append a null byte at the end, you will have to do this manually
+ *
+ * @param dest The destination buffer, this gets incremented
+ * @param source The string which gets copied into the buffer
+ */
+void strcpy_iterate(char** dest, char* source) {
+	while (*source) {
+		*((*dest)++) = *(source++);
+	}
+}
+
+esp_err_t wifi_send_data_to_server(connection_data_t* connection_data, uint32_t* sensor_values) {
+	char post_data[SERIALISED_DATA_MAX_BYTES] = {0};
+	uint32_t post_data_length = wifi_serialise_data(sensor_values, post_data);
+	LOG("Serialised WiFi post data");
+
+	// Generate the url to send the request too
+	char url[BASE_DATABASE_URL_LENGTH + PICC_SID_LENGTH + 1] = {0};
+	char* url_cursor = url;
+	strcpy_iterate(&url_cursor, BASE_DATABASE_URL);
+	strcpy_iterate(&url_cursor, connection_data->sid);
+	LOG("Generated valid URL");
+
+	char auth_header[HEADER_TEXT_LENGTH + PICC_TOKEN_LENGTH + 1] = {0};
+	char* auth_cursor = auth_header;
+	strcpy_iterate(&auth_cursor, "Bearer ");
+	strcpy_iterate(&auth_cursor, connection_data->token);
+	LOG("Generated bearer token");
+
+	esp_http_client_config_t config = {
+		.url = url,
+		.event_handler = http_event_handle,
+		.crt_bundle_attach = esp_crt_bundle_attach,
+	};
+	esp_http_client_handle_t client = esp_http_client_init(&config);
+	esp_http_client_set_method(client, HTTP_METHOD_POST);
+	esp_http_client_set_post_field(
+		client, post_data, post_data_length - 1
+	); // We subtract one as we want to send the length without the NULL byte
+	esp_http_client_set_header(client, "Content-Type", "application/json");
+	esp_http_client_set_header(client, "Authorization", auth_header);
+	LOG("Generated request");
+
+	return esp_http_client_perform(client);
+}
+
 
 esp_err_t wifi_start(const char* ssid, const char* password) {
 	// Create a config struct
