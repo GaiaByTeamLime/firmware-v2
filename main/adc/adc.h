@@ -3,7 +3,7 @@
 
 #include <esp_err.h>
 
-#define ADC1_PORTS 1
+#define ADC1_PORTS 2
 
 typedef struct {
 	esp_err_t messageResult;
@@ -12,6 +12,7 @@ typedef struct {
 
 typedef enum {
 	ADC1_LDR = 0,
+	ADC1_BAT = 1,
 } adc1_port_t;
 
 esp_err_t adc_init(void);
