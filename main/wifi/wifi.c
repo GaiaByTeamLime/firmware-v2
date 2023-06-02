@@ -11,6 +11,7 @@
 #include "wifi.h"
 
 esp_err_t (*wifi_connected_callback)(void);
+void (*wifi_disconnected_callback)(void);
 
 static void ip_event_handler(
 	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
@@ -27,7 +28,11 @@ static void wifi_event_handler(
 	// Just keep retrying on disconnects
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED ||
 		event_id == WIFI_EVENT_STA_START) {
-		esp_wifi_connect();
+		// close connection
+		esp_wifi_deinit();
+		// esp_event_loop_delete_default();
+		// esp_netif_destroy_default_wifi();
+		wifi_disconnected_callback();
 	}
 }
 
@@ -69,8 +74,12 @@ esp_err_t wifi_start(const char* ssid, const char* password) {
 	return ESP_OK;
 }
 
-esp_err_t wifi_init(esp_err_t (*callback)(void)) {
-	wifi_connected_callback = callback;
+esp_err_t wifi_init(
+	esp_err_t (*connected_callback)(void),
+	esp_err_t (*disconnected_callback)(void)
+) {
+	wifi_connected_callback = connected_callback;
+	wifi_disconnected_callback = disconnected_callback;
 
 	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
 	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
@@ -98,3 +107,5 @@ esp_err_t wifi_init(esp_err_t (*callback)(void)) {
 
 	return ESP_OK;
 }
+
+void wifi_stop(void) { esp_wifi_stop(); }

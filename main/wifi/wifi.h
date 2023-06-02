@@ -8,11 +8,16 @@
  * when the device connects to a network.
  * At the current moment, we only support WPA2-PSK encryption method
  *
- * @param callback The callback function to be invoked once the device
+ * @param connected_callback The callback function to be invoked once the device
  * connected to a network
+ * @param connected_callback The callback function to be invoked once the device
+ * disconnected to a network
  * @return Any error the WiFi driver may have encountered
  */
-esp_err_t wifi_init(esp_err_t (*callback)(void));
+esp_err_t wifi_init(
+	esp_err_t (*connected_callback)(void),
+	esp_err_t (*disconnected_callback)(void)
+);
 
 /**
  * Start & connect to the WiFi network
@@ -26,5 +31,12 @@ esp_err_t wifi_init(esp_err_t (*callback)(void));
  * @return Any error the WiFi driver may have encountered
  */
 esp_err_t wifi_start(const char* ssid, const char* password);
+
+/**
+ * Close the WiFi connection
+ *
+ *
+ */
+void wifi_stop(void);
 
 #endif

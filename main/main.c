@@ -1,16 +1,17 @@
 #include "prelude.h"
 
 #include "adc/adc.h"
+#include "ndef/ndef.h"
 #include "persistent_storage/persistent_storage.h"
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
-// #include "wifi/wifi.h"
-#include "ndef/ndef.h"
+#include "wifi/wifi.h"
 
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
+#include <esp_sleep.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
@@ -77,8 +78,27 @@ void print_buffer(uint8_t* buffer, uint8_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
+bool connected = false;
+
 esp_err_t on_wifi_connect(void) {
-	LOG("Yay we connected!");
+	// collect sensordata
+	// send sensordata
+	// close connection
+	connected = true;
+	wifi_stop();
+	return ESP_OK;
+}
+
+void on_wifi_disconnect(void) {
+	if (!connected) {
+		// delete wifi credentials
+		persistent_storage_set_wifi(NULL, NULL);
+		// deep sleep (forever)
+		esp_deep_sleep_start();
+	} else {
+		// deep sleep (60 minutes)
+		// esp_deep_sleep();
+	}
 	return ESP_OK;
 }
 
@@ -91,79 +111,37 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
 
+	PASS_ERROR(
+		wifi_init(&on_wifi_connect, &on_wifi_disconnect),
+		"Could not initialize wifi"
+	);
+
 	return ESP_OK;
 }
 
 void app_main(void) {
-	int index = 0;
-
-	esp_err_t message = adc_init();
-	if (message != ESP_OK) {
-		while (1) {
-			LOG("ADC1 Init Error");
-		}
-	}
-
+	// setup
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	// Wake up the rfid reader
-	rfid_wakeup_mifare_tag(&rfid_handle);
+	// get wifi credentials
+	char ssid[WIFI_SSID_CHAR_BUFFER_LENGTH];
+	char password[WIFI_PASSWORD_CHAR_BUFFER_LENGTH];
+	esp_err_t result = persistent_storage_get_wifi(&ssid, &password);
 
-	tag_data_t tag = ndef_create_type();
-
-	ndef_extract_all_records(&rfid_handle, &tag);
-
-	print_buffer(tag.raw_data, tag.raw_data_length, 4);
-
-	// Print out all records
-	LOG("Record count: %d", tag.record_count);
-	for (uint8_t record_index = 0; record_index < tag.record_count;
-		 record_index++) {
-		ndef_record_t record = tag.records[record_index];
-		LOG("Record (payload length=%d):", record.payload_size);
-		for (uint8_t byte_index = 0; byte_index < record.payload_size;
-			 byte_index++) {
-			uint8_t data = record.payload[byte_index];
-			LOG("\t0x%02x = %c", data, represent_byte(data));
+	if (result != ESP_OK || /* wifi credentials are not pressent */) {
+		{
+			// read nfc tag
+			if (/* wifi credentials are finaly present*/) {
+				// save wifi credentials
+				persistent_storage_set_wifi(&ssid, &password);
+			} else {
+				// deep sleep (forever)
+				esp_deep_sleep_start();
+			}
 		}
 	}
-	LOG("End of records");
 
-	ndef_destroy_type(&tag);
-
-	while (1) {
-		pull_latest_data();
-		uint32_t adc_data;
-		message = get_adc_data(ADC1_LDR, &adc_data);
-		if (message == ESP_OK) {
-			LOG("LDR Data: %lu", adc_data);
-		}
-		LOG("Test! %d", index++);
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-	}
-
-	// Read actual data from the tag
-	// rfid_read_mifare_tag(&rfid_handle, 4 + 4, buffer, 16);
-
-	// Output the data
-	// LOG("SUCCES:");
-	// for (uint8_t i = 0; i < 16; i++) {
-	// 	LOG("\t%x (%c)", buffer[i], buffer[i]);
-	// }
-	// LOG("END");
-
-	// while (1) {
-	// 	pull_latest_data();
-	// 	uint32_t adc_data;
-	// 	message = get_adc_data(ADC1_LDR, &adc_data);
-	// 	if (message == ESP_OK) {
-	// 		LOG("LDR Data: %lu", adc_data);
-	// 	}
-	// 	LOG("Test! %d", index++);
-	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	// }
-
-	// wifi_init(&on_wifi_connect);
-	// wifi_start("TestSpot", "baguette");
+	// connect to wifi
+	wifi_start(&ssid, &password);
 }
