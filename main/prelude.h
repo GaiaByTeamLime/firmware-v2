@@ -100,7 +100,6 @@
 		} \
 	}
 #endif
-#endif
 
 typedef struct {
 	char ssid[MAX_SSID_LENGTH + 1];
@@ -108,3 +107,6 @@ typedef struct {
 	char sid[SENSOR_ID_LENGTH + 1];
 	char token[SENSOR_TOKEN_LENGTH + 1];
 } connection_data_t;
+
+#endif
+
