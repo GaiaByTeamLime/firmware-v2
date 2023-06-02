@@ -82,6 +82,9 @@ esp_err_t measure_soil_capacity() {
 }
 
 esp_err_t measure_battery_voltage() {
-
+	pull_latest_data();
+	uint32_t adc_data;
+	PASS_ERROR(get_adc_data(ADC1_BAT, &adc_data), "Something went wrong on getting the battery voltage level.");
+	LOG("Battery Voltage Measurement: %lu", adc_data);
 	return ESP_OK;
 }

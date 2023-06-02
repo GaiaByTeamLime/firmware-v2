@@ -45,7 +45,7 @@ esp_err_t adc_init(void) {
 
 	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
 		PASS_ERROR(
-			adc_oneshot_config_channel(adc1_handle, i, &config),
+			adc_oneshot_config_channel(adc1_handle, adc1_ports[i], &config),
 			"ADC1 channel config failed"
 		);
 	}
