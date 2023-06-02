@@ -2,7 +2,6 @@
 #include "../prelude.h"
 
 #include <esp_crt_bundle.h>
-#include <esp_http_client.h>
 #include <esp_err.h>
 #include <esp_event.h>
 #include <esp_http_client.h>
@@ -14,8 +13,8 @@
 #include <freertos/task.h>
 #include <nvs_flash.h>
 
-#include "wifi.h"
 #include "picc.h"
+#include "wifi.h"
 
 bool is_connected = false;
 
@@ -66,20 +65,22 @@ static void wifi_event_handler(
 	}
 }
 
-esp_err_t http_event_handle(esp_http_client_event_t* handle) { 
+esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 	char str[handle->data_len + 1];
 	for (uint8_t i = 0; i < handle->data_len; i++) {
 		str[i] = *(((char*)handle->data) + i);
 	}
 	str[handle->data_len] = '\0';
 	LOG("\n%s", str);
-	return ESP_OK; }
+	return ESP_OK;
+}
 
 /**
  * Same as the standard C strcpy, except it interates the pointer, making it
  * suitable to concatenate several strings.
  *
- * @warning This function does *not* append a null byte at the end, you will have to do this manually
+ * @warning This function does *not* append a null byte at the end, you will
+ * have to do this manually
  *
  * @param dest The destination buffer, this gets incremented
  * @param source The string which gets copied into the buffer
@@ -90,7 +91,9 @@ void strcpy_iterate(char** dest, char* source) {
 	}
 }
 
-esp_err_t wifi_send_data_to_server(connection_data_t* connection_data, uint32_t* sensor_values) {
+esp_err_t wifi_send_data_to_server(
+	connection_data_t* connection_data, uint32_t* sensor_values
+) {
 	char post_data[SERIALISED_DATA_MAX_BYTES] = {0};
 	uint32_t post_data_length = wifi_serialise_data(sensor_values, post_data);
 	LOG("Serialised WiFi post data");
@@ -124,7 +127,6 @@ esp_err_t wifi_send_data_to_server(connection_data_t* connection_data, uint32_t*
 
 	return esp_http_client_perform(client);
 }
-
 
 esp_err_t wifi_start(const char* ssid, const char* password) {
 	// Create a config struct
