@@ -93,7 +93,7 @@ esp_err_t persistent_storage_get_connection_data(
 	PASS_ERROR(
 		nvs_get_str(
 			nvs,
-			WIFI_PASSWORD_MAX_LENGTH,
+			WIFI_PASSWORD_KEY,
 			connection_data->password,
 			&max_length
 		),
@@ -111,7 +111,7 @@ esp_err_t persistent_storage_get_connection_data(
 	max_length = SENSOR_TOKEN_LENGTH;
 	PASS_ERROR(
 		nvs_get_str(
-			nvs, SENSOR_TOKEN_LENGTH, connection_data->token, &max_length
+			nvs, SENSOR_TOKEN_KEY, connection_data->token, &max_length
 		),
 		"Failed to get sensor token from NVS storage"
 	);
