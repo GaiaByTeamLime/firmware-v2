@@ -1,5 +1,5 @@
 #include "sensors.h"
-#include "adc.c"
+#include "adc.h"
 
 static uint64_t count = 0;
 static uint64_t prev_count = 0;
@@ -53,11 +53,30 @@ esp_err_t capacity_sensor_init() {
 	return ESP_OK;
 }
 
+esp_err_t battery_measurement_init() {
+	PASS_ERROR(
+		gpio_set_direction(BATTERY_MEASUREMENT_PIN, GPIO_MODE_INPUT), "Could not do the funny to Input"
+	);
+	PASS_ERROR(
+		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN), "Could not disable internal pulldown resistor."
+	);
+	
 
+	return ESP_OK;
+}
+
+esp_err_t measure_battery_voltage() {
+	pull_latest_data();
+	uint32_t adc_data;
+	PASS_ERROR(get_adc_data(ADC1_BAT, &adc_data), "Something went wrong on getting the battery voltage level.");
+	LOG("Battery Voltage Measurement: %lu", adc_data);
+	return ESP_OK;
+}
 
 esp_err_t sensors_init() {
 	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
+	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
 
 	return ESP_OK;
 }

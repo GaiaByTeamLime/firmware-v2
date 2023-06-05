@@ -93,27 +93,18 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
 	PASS_ERROR(sensors_init(), "Could not initialize sensors");
-	PASS_ERROR(sensors_init(), "Could not initialize sensors");
 
 	return ESP_OK;
 }
 
 void app_main(void) {
-	int index = 0;
-
-	esp_err_t message = adc_init();
-	if (message != ESP_OK) {
-		while (1) {
-			LOG("ADC1 Init Error");
-		}
-	}
-
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
 	while (true) {
 		measure_soil_capacity();
 		vTaskDelay(pdMS_TO_TICKS(50));
+		count++;
 	}
 
 	// // Wake up the rfid reader

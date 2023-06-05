@@ -16,8 +16,8 @@
  *
  */
 typedef enum {
-	ADC1_LDR, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO
-				 only port */
+	ADC1_LDR = 0, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO only port */
+	ADC1_BAT = 1,
 } adc1_port_t;
 
 /**
@@ -34,11 +34,6 @@ typedef struct {
 	esp_err_t messageResult;
 	uint32_t data;
 } adc_data_t;
-
-typedef enum {
-	ADC1_LDR = 0,
-	ADC1_BAT = 1,
-} adc1_port_t;
 
 esp_err_t adc_init(void);
 
