@@ -38,6 +38,11 @@ typedef struct tag_data {
  */
 #define MAX_BYTE_COUNT 144
 
+/**
+ * How many bytes there are in an TLV message
+ */
+#define TLV_PREAMBLE 5
+
 #define TLV_NDEF_MESSAGE 0x03
 #define TLV_TERMINATE 0xfe
 #define TLV_NULL 0x00
@@ -108,12 +113,20 @@ void ndef_destroy_type(tag_data_t* tag);
  * will skip the starting bytes (in case the pointer hasn't been incremented
  * before), afterwards it will only iterate over TLV_NULL bytes.
  *
+ * @deprecated Although this function still works, it is no longer in use by the
+ * rest of the system and it's use is discouraged. For data parsing, use the
+ * picc module instead
+ *
  * @returns The length of the TLV payload
  */
 uint8_t ndef_move_to_nearest_tlv(tag_data_t* tag);
 
 /**
  * @returns Is the pointer pointing at an TLV_TERMINATE byte
+ *
+ * @deprecated Although this function still works, it is no longer in use by the
+ * rest of the system and it's use is discouraged. For data parsing, use the
+ * picc module instead
  */
 bool ndef_is_end_of_tlv(tag_data_t* tag);
 
@@ -136,6 +149,10 @@ bool ndef_is_end_of_tlv(tag_data_t* tag);
  * @warning An tag_data_t struct can hold at most `MAX_RECORD_COUNT` NDEF
  * records, attempting to parse more may result into invalid memory writes
  *
+ * @deprecated Although this function still works, it is no longer in use by the
+ * rest of the system and it's use is discouraged. For data parsing, use the
+ * picc module instead
+ *
  * @returns Possible error during the parsing
  */
 esp_err_t ndef_parse_record(tag_data_t* tag);
@@ -152,6 +169,10 @@ esp_err_t ndef_parse_record(tag_data_t* tag);
  * @see ndef_full_scan
  * @see ndef_parse_record
  * @see ndef_is_end_of_tlv
+ *
+ * @deprecated Although this function still works, it is no longer in use by the
+ * rest of the system and it's use is discouraged. For data parsing, use the
+ * picc module instead
  *
  * @param handle The SPI device handle
  * @param tag An empty NDEF data tag

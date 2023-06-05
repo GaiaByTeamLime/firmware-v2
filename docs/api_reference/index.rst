@@ -11,3 +11,4 @@ API Reference
     rfid.rst
     wifi.rst
     ndef.rst
+    picc.rst
