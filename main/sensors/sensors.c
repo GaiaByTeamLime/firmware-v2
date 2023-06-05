@@ -5,6 +5,9 @@ static uint64_t count = 0;
 static uint64_t prev_count = 0;
 static bool timer_started = false;
 static gptimer_handle_t timer_handle = NULL;
+static uint32_t ldr_data;
+static uint32_t prev_ldr_data;
+static uint32_t bat_data;
 
 static void interrupt_handler(void* args) {
 	if (!timer_started) {
@@ -66,10 +69,8 @@ esp_err_t battery_measurement_init() {
 }
 
 esp_err_t measure_battery_voltage() {
-	pull_latest_data();
-	uint32_t adc_data;
-	PASS_ERROR(get_adc_data(ADC1_BAT, &adc_data), "Something went wrong on getting the battery voltage level.");
-	LOG("Battery Voltage Measurement: %lu", adc_data);
+	PASS_ERROR(get_adc_data(ADC1_BAT, &bat_data), "Something went wrong on getting the battery voltage level.");
+	LOG("Battery Voltage Measurement: %lu", bat_data);
 	return ESP_OK;
 }
 
@@ -90,3 +91,11 @@ esp_err_t measure_soil_capacity() {
 	return ESP_OK;
 }
 
+esp_err_t measure_ldr() {
+	get_adc_data(ADC1_LDR, &ldr_data);
+	if(prev_ldr_data != ldr_data) {
+		LOG("LDR Sensor measurement: %lu", ldr_data);
+	}
+	
+	return ESP_OK;
+}

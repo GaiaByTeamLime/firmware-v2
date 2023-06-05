@@ -102,9 +102,12 @@ void app_main(void) {
 	setup(&rfid_handle);
 
 	while (true) {
+		pull_latest_data();
+
 		measure_soil_capacity();
-		vTaskDelay(pdMS_TO_TICKS(50));
-		count++;
+		measure_ldr();
+		measure_battery_voltage();
+		vTaskDelay(pdMS_TO_TICKS(250));
 	}
 
 	// // Wake up the rfid reader
