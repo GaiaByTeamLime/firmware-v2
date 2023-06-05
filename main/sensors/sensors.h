@@ -7,8 +7,8 @@
 #include <driver/gptimer.h>
 #include <esp_err.h>
 
-#define CAPACITY_SENSOR_PIN GPIO_NUM_1
-#define BATTERY_MEASUREMENT_PIN GPIO_NUM_4
+#define CAPACITY_SENSOR_PIN 1
+#define BATTERY_MEASUREMENT_PIN 4
 #define CAPACITY_SENSOR_GPTIMER_RESOLUTION_HZ 40000000
 
 /**
