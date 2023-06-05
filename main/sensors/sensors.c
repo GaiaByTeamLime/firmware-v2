@@ -58,18 +58,22 @@ esp_err_t capacity_sensor_init() {
 
 esp_err_t battery_measurement_init() {
 	PASS_ERROR(
-		gpio_set_direction(BATTERY_MEASUREMENT_PIN, GPIO_MODE_INPUT), "Could not do the funny to Input"
+		gpio_set_direction(BATTERY_MEASUREMENT_PIN, GPIO_MODE_INPUT),
+		"Could not do the funny to Input"
 	);
 	PASS_ERROR(
-		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN), "Could not disable internal pulldown resistor."
+		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
+		"Could not disable internal pulldown resistor."
 	);
-	
 
 	return ESP_OK;
 }
 
 esp_err_t measure_battery_voltage() {
-	PASS_ERROR(get_adc_data(ADC1_BAT, &bat_data), "Something went wrong on getting the battery voltage level.");
+	PASS_ERROR(
+		get_adc_data(ADC1_BAT, &bat_data),
+		"Something went wrong on getting the battery voltage level."
+	);
 	LOG("Battery Voltage Measurement: %lu", bat_data);
 	return ESP_OK;
 }
@@ -77,7 +81,9 @@ esp_err_t measure_battery_voltage() {
 esp_err_t sensors_init() {
 	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
-	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
+	PASS_ERROR(
+		battery_measurement_init(), "Could not init battery measurement sensor."
+	);
 
 	return ESP_OK;
 }
@@ -93,9 +99,9 @@ esp_err_t measure_soil_capacity() {
 
 esp_err_t measure_ldr() {
 	get_adc_data(ADC1_LDR, &ldr_data);
-	if(prev_ldr_data != ldr_data) {
+	if (prev_ldr_data != ldr_data) {
 		LOG("LDR Sensor measurement: %lu", ldr_data);
 	}
-	
+
 	return ESP_OK;
 }
