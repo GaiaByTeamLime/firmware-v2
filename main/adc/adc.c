@@ -13,7 +13,7 @@
 
 adc_oneshot_unit_handle_t adc1_handle;
 
-adc_data_t adc_result[ADC1_PORTS] = {0};
+adc_data_t adc_result[ADC1_PORTS] = {0,0};
 adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
 	ADC_CHANNEL_3,
 	ADC_CHANNEL_2,
