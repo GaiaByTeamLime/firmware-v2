@@ -10,8 +10,7 @@
 #define MAX_RETURN_BYTES 16
 
 esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
-	for (uint8_t sectors = 0;
-		 sectors < (MAX_BYTE_COUNT / MAX_RETURN_BYTES);
+	for (uint8_t sectors = 0; sectors < (MAX_BYTE_COUNT / MAX_RETURN_BYTES);
 		 sectors++) {
 		PASS_ERROR(
 			rfid_read_mifare_tag(
