@@ -74,7 +74,7 @@ esp_err_t measure_battery_voltage() {
 		get_adc_data(ADC1_BAT, &bat_data),
 		"Something went wrong on getting the battery voltage level."
 	);
-	LOG("Battery Voltage Measurement: %lu", bat_data);
+	LOG("Battery Voltage Measurement: %u", bat_data);
 	return ESP_OK;
 }
 
