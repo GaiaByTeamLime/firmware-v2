@@ -9,6 +9,7 @@ Index
 .. toctree::
     :maxdepth: 2
 
+    getting_started
     api_reference/index
 
 
