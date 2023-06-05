@@ -10,6 +10,13 @@
 
 #include <esp_log.h>
 
+typedef struct {
+	char ssid[MAX_SSID_LENGTH + 1];
+	char password[MAX_PASSWORD_LENGTH + 1];
+	char sid[SENSOR_ID_LENGTH + 1];
+	char token[SENSOR_TOKEN_LENGTH + 1];
+} connection_data_t;
+
 /***
  * the duration of the deep sleep (1 hour). If you want to use the deep sleep,
  * call the function esp_deep_sleep(SLEEP_DURATION) in your code and include the
@@ -100,12 +107,5 @@
 		} \
 	}
 #endif
-
-typedef struct {
-	char ssid[MAX_SSID_LENGTH + 1];
-	char password[MAX_PASSWORD_LENGTH + 1];
-	char sid[SENSOR_ID_LENGTH + 1];
-	char token[SENSOR_TOKEN_LENGTH + 1];
-} connection_data_t;
 
 #endif
