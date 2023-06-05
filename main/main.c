@@ -8,7 +8,6 @@
 // #include "wifi/wifi.h"
 #include "ndef/ndef.h"
 #include "sensors/sensors.h"
-#include "sensors/sensors.h"
 
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
