@@ -14,7 +14,7 @@
 adc_oneshot_unit_handle_t adc1_handle;
 
 adc_data_t adc_result[ADC1_PORTS] = {0};
-adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
+adc1_port_t adc1_ports[ADC1_PORTS] = {
 	ADC_CHANNEL_3,
 	ADC_CHANNEL_4,
 };
@@ -38,7 +38,7 @@ esp_err_t adc_init(void) {
 							 // atten, how higher the input voltage can be
 	};
 
-	for (uint8_t i = 0; i < ADC1_PORTS_AMOUNT; i++) {
+	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
 		PASS_ERROR(
 			adc_oneshot_config_channel(adc1_handle, adc1_ports[i], &config),
 			"ADC1 channel config failed"
@@ -58,7 +58,7 @@ esp_err_t adc_init(void) {
 }
 
 void pull_latest_data(void) {
-	for (uint8_t i = 0; i < ADC1_PORTS_AMOUNT; i++) {
+	for (uint8_t i = 0; i < ADC1_PORTS; i++) {
 		adc_result[i].messageResult = adc_oneshot_read(
 			adc1_handle,
 			adc1_ports[i],
