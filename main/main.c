@@ -17,6 +17,7 @@
 #include "rfid/rfid_pcd_register_types.h"
 #include "spi/spi.h"
 #include "wifi/wifi.h"
+#include "sensors/sensors.h"
 
 char represent_byte(uint8_t byte) {
 	if ((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
