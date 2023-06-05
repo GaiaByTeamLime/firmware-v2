@@ -49,7 +49,7 @@ esp_err_t persistent_storage_set_connection_data(
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, SENSOR_ID_KEY, connection_data->sid, SENSOR_TOKEN_LENGTH
+			&nvs, SENSOR_ID_KEY, connection_data->sid, SENSOR_ID_LENGTH
 		),
 		"Failed to write sensor ID to storage"
 	);

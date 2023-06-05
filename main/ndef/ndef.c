@@ -5,17 +5,20 @@
 #include "ndef.h"
 #include "prelude.h"
 
+#define USER_DATA_BEGIN 4
+#define BYTES_PER_SECTOR 4
+#define MAX_RETURN_BYTES 16
+
 esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
-	const uint8_t MAX_BYTES_PER_SECTION = 16;
 	for (uint8_t sectors = 0;
-		 sectors < (MAX_BYTE_COUNT / MAX_BYTES_PER_SECTION);
+		 sectors < (MAX_BYTE_COUNT / MAX_RETURN_BYTES);
 		 sectors++) {
 		PASS_ERROR(
 			rfid_read_mifare_tag(
 				handle,
-				4 + sectors * 4,
-				tag->raw_data + sectors * MAX_BYTES_PER_SECTION,
-				MAX_BYTES_PER_SECTION
+				USER_DATA_BEGIN + sectors * BYTES_PER_SECTOR,
+				tag->raw_data + sectors * MAX_RETURN_BYTES,
+				MAX_RETURN_BYTES
 			),
 			"Failed reading sector"
 		);

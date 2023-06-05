@@ -11,7 +11,6 @@
  * This is currently set to 1000, at a 40kHz frequency, this means the timeout
  * period is 25ms
  */
-//#define TIMER_DURATION 0x03e8
 #define TIMER_DURATION 0x03e8
 /**
  * Timer frequency formula

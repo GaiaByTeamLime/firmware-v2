@@ -42,10 +42,21 @@ esp_err_t persistent_storage_set_str(
 	size_t max_string_length
 );
 
+/**
+ * Save connection data to persistent storage.
+ *
+ * @param connection_data The configuration to save
+ */
 esp_err_t persistent_storage_set_connection_data(
 	connection_data_t* connection_data
 );
 
+/**
+ * Retrieve connection data from persistent storage.
+ *
+ * @param connection_data The struct to write data too, the entirity of this
+ * struct will be overwritten
+ */
 esp_err_t persistent_storage_get_connection_data(
 	connection_data_t* connection_data
 );
