@@ -19,10 +19,6 @@ adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
 	ADC_CHANNEL_2,
 };
 
-adc1_port_t adc1_ports[ADC1_PORTS_AMOUNT] = {
-	ADC_CHANNEL_3,
-};
-
 esp_err_t adc_init(void) {
 	// ADC1 Init
 	adc_oneshot_unit_init_cfg_t init_config1 = {
