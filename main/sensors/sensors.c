@@ -100,7 +100,7 @@ esp_err_t measure_soil_capacity() {
 esp_err_t measure_ldr() {
 	get_adc_data(ADC1_LDR, &ldr_data);
 	if (prev_ldr_data != ldr_data) {
-		LOG("LDR Sensor measurement: %lu", ldr_data);
+		LOG("LDR Sensor measurement: %u", ldr_data);
 	}
 
 	return ESP_OK;
