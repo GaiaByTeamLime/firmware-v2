@@ -18,7 +18,9 @@ esp_err_t persistent_storage_set_str(
 	return ESP_OK;
 }
 
-esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
+esp_err_t persistent_storage_set_connection_data(
+	connection_data_t* connection_data
+) {
 	nvs_handle_t nvs;
 	PASS_ERROR(
 		nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs),
@@ -28,7 +30,7 @@ esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, WIFI_SSID_KEY, ssid, WIFI_SSID_MAX_LENGTH
+			&nvs, WIFI_SSID_KEY, connection_data->ssid, WIFI_SSID_MAX_LENGTH
 		),
 		"Failed to write WiFi SSID to storage"
 	);
@@ -36,11 +38,30 @@ esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
 
 	PASS_ERROR(
 		persistent_storage_set_str(
-			&nvs, WIFI_PASSWORD_KEY, password, WIFI_PASSWORD_MAX_LENGTH
+			&nvs,
+			WIFI_PASSWORD_KEY,
+			connection_data->password,
+			WIFI_PASSWORD_MAX_LENGTH
 		),
-		"Failed to write WiFi password to"
+		"Failed to write WiFi password to storage"
 	);
 	LOG("NVS Set WiFi password");
+
+	PASS_ERROR(
+		persistent_storage_set_str(
+			&nvs, SENSOR_ID_KEY, connection_data->sid, SENSOR_ID_LENGTH
+		),
+		"Failed to write sensor ID to storage"
+	);
+	LOG("NVS Set sensor ID");
+
+	PASS_ERROR(
+		persistent_storage_set_str(
+			&nvs, SENSOR_TOKEN_KEY, connection_data->token, SENSOR_TOKEN_LENGTH
+		),
+		"Failed to write sensor token to storage"
+	);
+	LOG("NVS Set sensor token");
 
 	PASS_ERROR(nvs_commit(nvs), "Failed to commit NVS");
 	LOG("NVS Commit");
@@ -51,7 +72,9 @@ esp_err_t persistent_storage_set_wifi(const char* ssid, const char* password) {
 	return ESP_OK;
 }
 
-esp_err_t persistent_storage_get_wifi(char* ssid, char* password) {
+esp_err_t persistent_storage_get_connection_data(
+	connection_data_t* connection_data
+) {
 	nvs_handle_t nvs;
 	PASS_ERROR(
 		nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs),
@@ -59,22 +82,37 @@ esp_err_t persistent_storage_get_wifi(char* ssid, char* password) {
 	);
 	LOG("NVS Open");
 
-	size_t max_length = WIFI_SSID_CHAR_BUFFER_LENGTH;
+	size_t max_length = WIFI_SSID_MAX_LENGTH;
 	PASS_ERROR(
-		nvs_get_str(nvs, WIFI_SSID_KEY, ssid, &max_length),
+		nvs_get_str(nvs, WIFI_SSID_KEY, connection_data->ssid, &max_length),
 		"Failed to get WiFi SSID from NVS storage"
 	);
 	LOG("NVS Get WiFi SSID");
 
-	max_length = WIFI_PASSWORD_CHAR_BUFFER_LENGTH;
+	max_length = WIFI_PASSWORD_MAX_LENGTH;
 	PASS_ERROR(
-		nvs_get_str(nvs, WIFI_PASSWORD_KEY, password, &max_length),
-		"Failed to get WiFi Password from NVS storage"
+		nvs_get_str(
+			nvs, WIFI_PASSWORD_KEY, connection_data->password, &max_length
+		),
+		"Failed to get WiFi password from NVS storage"
 	);
-	LOG("NVS Get string");
+	LOG("NVS Get WiFi password");
 
-	nvs_close(nvs);
-	LOG("NVS Close");
+	max_length = SENSOR_ID_LENGTH;
+	PASS_ERROR(
+		nvs_get_str(nvs, SENSOR_ID_KEY, connection_data->sid, &max_length),
+		"Failed to get sensor ID from NVS storage"
+	);
+	LOG("NVS Get sensor ID");
+
+	max_length = SENSOR_TOKEN_LENGTH;
+	PASS_ERROR(
+		nvs_get_str(nvs, SENSOR_TOKEN_KEY, connection_data->token, &max_length),
+		"Failed to get sensor token from NVS storage"
+	);
+	LOG("NVS Get sensor token");
 
 	return ESP_OK;
 }
+
+esp_err_t persistent_storage_erase() { return nvs_flash_erase(); }

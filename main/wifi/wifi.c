@@ -1,39 +1,146 @@
 
 #include "../prelude.h"
 
+#include <esp_crt_bundle.h>
+#include <esp_err.h>
 #include <esp_event.h>
+#include <esp_http_client.h>
 #include <esp_netif.h>
+#include <esp_sleep.h>
 #include <esp_wifi.h>
+#include <esp_wifi_types.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <nvs_flash.h>
 
-#include "esp_err.h"
-#include "esp_wifi_types.h"
+#include "picc.h"
 #include "wifi.h"
 
-esp_err_t (*wifi_connected_callback)(void);
-void (*wifi_disconnected_callback)(void);
+bool is_connected = false;
 
+void (*wifi_connected_callback)(void);
+
+/**
+ * Ugly function, only here to satisfy the function signiture of FreeRTOS
+ */
+void on_wifi_connect_task(void* params) {
+	wifi_connected_callback();
+	vTaskDelete(NULL);
+}
+
+/**
+ * The IP event handler
+ */
 static void ip_event_handler(
 	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
 ) {
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
-		wifi_connected_callback();
+		is_connected = true;
+		xTaskCreate(
+			&on_wifi_connect_task,
+			"OnWifiConnected",
+			configMINIMAL_STACK_SIZE + 5000,
+			NULL,
+			tskIDLE_PRIORITY,
+			NULL
+		);
 	}
 }
 
+/**
+ * The WiFi event handler
+ */
 static void wifi_event_handler(
 	void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data
 ) {
 	// Just keep retrying on disconnects
-	if (event_id == WIFI_EVENT_STA_DISCONNECTED ||
-		event_id == WIFI_EVENT_STA_START) {
-		// close connection
-		esp_wifi_deinit();
-		// esp_event_loop_delete_default();
-		// esp_netif_destroy_default_wifi();
-		wifi_disconnected_callback();
+	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
+		is_connected = false;
+		ELOG("Disconnected, I'm going to cry now");
+		// // close connection
+		// esp_wifi_deinit();
+		// // esp_event_loop_delete_default();
+		// // esp_netif_destroy_default_wifi();
+		// wifi_disconnected_callback();
+		esp_deep_sleep(SLEEP_DURATION);
 	}
+	if (event_id == WIFI_EVENT_STA_START) {
+		esp_wifi_connect();
+	}
+}
+
+esp_err_t http_event_handle(esp_http_client_event_t* handle) {
+	char str[handle->data_len + 1];
+	for (uint8_t i = 0; i < handle->data_len; i++) {
+		str[i] = *(((char*)handle->data) + i);
+	}
+	str[handle->data_len] = '\0';
+	LOG("\n%s", str);
+	return ESP_OK;
+}
+
+/**
+ * Same as the standard C strcpy, except it interates the pointer, making it
+ * suitable to concatenate several strings.
+ *
+ * @warning This function does *not* append a null byte at the end, you will
+ * have to do this manually
+ *
+ * @param dest The destination buffer, this gets incremented
+ * @param source The string which gets copied into the buffer
+ */
+void strcpy_iterate(char** dest, char* source) {
+	while (*source) {
+		*((*dest)++) = *(source++);
+	}
+}
+
+esp_err_t wifi_send_data_to_server(
+	connection_data_t* connection_data, uint32_t* sensor_values
+) {
+	char post_data[SERIALISED_DATA_MAX_BYTES] = {0};
+	uint32_t post_data_length = wifi_serialise_data(sensor_values, post_data);
+	LOG("Serialised WiFi post data");
+
+	// Generate the url to send the request too
+	char url[BASE_DATABASE_URL_LENGTH + PICC_SID_LENGTH + 1] = {0};
+	char* url_cursor = url;
+	strcpy_iterate(&url_cursor, BASE_DATABASE_URL);
+	strcpy_iterate(&url_cursor, connection_data->sid);
+	LOG("Generated valid URL");
+
+	char auth_header[HEADER_TEXT_LENGTH + PICC_TOKEN_LENGTH + 1] = {0};
+	char* auth_cursor = auth_header;
+	strcpy_iterate(&auth_cursor, "Bearer ");
+	strcpy_iterate(&auth_cursor, connection_data->token);
+	LOG("Generated bearer token");
+
+	esp_http_client_config_t config = {
+		.url = url,
+		.event_handler = http_event_handle,
+		.crt_bundle_attach = esp_crt_bundle_attach,
+	};
+	esp_http_client_handle_t client = esp_http_client_init(&config);
+	PASS_ERROR(
+		esp_http_client_set_method(client, HTTP_METHOD_POST),
+		"Unable to set method"
+	);
+	PASS_ERROR(
+		esp_http_client_set_post_field(client, post_data, post_data_length - 1),
+		"Unable to set post data"
+	); // We subtract one as we want to send the length without the NULL byte
+	PASS_ERROR(
+		esp_http_client_set_header(client, "Content-Type", "application/json"),
+		"Unable to set content type"
+	);
+	PASS_ERROR(
+		esp_http_client_set_header(client, "Authorization", auth_header),
+		"Unable to set authorization"
+	);
+	LOG("Generated request");
+
+	return esp_http_client_perform(client);
 }
 
 esp_err_t wifi_start(const char* ssid, const char* password) {
@@ -74,12 +181,8 @@ esp_err_t wifi_start(const char* ssid, const char* password) {
 	return ESP_OK;
 }
 
-esp_err_t wifi_init(
-	esp_err_t (*connected_callback)(void),
-	esp_err_t (*disconnected_callback)(void)
-) {
-	wifi_connected_callback = connected_callback;
-	wifi_disconnected_callback = disconnected_callback;
+esp_err_t wifi_init(void (*success)(void)) {
+	wifi_connected_callback = success;
 
 	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
 	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
@@ -109,3 +212,42 @@ esp_err_t wifi_init(
 }
 
 void wifi_stop(void) { esp_wifi_stop(); }
+
+uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
+	char fields[SENSOR_DATA_FIELD_COUNT] = "fihtvHs";
+	char* begin = output;
+
+	*(output++) = '{';
+	for (uint8_t field_index = 0; field_index < SENSOR_DATA_FIELD_COUNT;
+		 field_index++) {
+		*(output++) = '"';
+		*(output++) = fields[field_index];
+		*(output++) = '"';
+		*(output++) = ':';
+		// Convert value into a string
+		uint32_t value = sensor_data[field_index];
+
+		// Increment the pointer to the end of the serialised number
+		while (value) {
+			output++;
+			value /= 10;
+		}
+		char* end_of_number = output; // Save the current position for later
+		output--; // Decrement one, now we are at the place the last digit
+				  // should be placed
+		// Serialise the number, this process starts at the LSB, so we have to
+		// move the pointer backwards, otherwise the number is reverted
+		value = sensor_data[field_index];
+		while (value) {
+			*(output--) = '0' + (value % 10);
+			value /= 10;
+		}
+		// Restore the pointer
+		output = end_of_number;
+		*(output++) = ',';
+	}
+	*(--output) = '}';
+	*(++output) = '\0';
+
+	return output - begin + 1;
+};
