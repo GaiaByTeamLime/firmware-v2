@@ -23,8 +23,11 @@
  * Setup the entire WiFi driver, register a callback function for
  * when the device connects to a network.
  * At the current moment, we only support WPA2-PSK encryption method
+ *
+ * @param success The callback function to be invoked once the device connected
+ * to a network* @ return Any error the WiFi driver may have encountered
  */
-esp_err_t wifi_init();
+esp_err_t wifi_init(void (*success)(void));
 
 /**
  * Send sensor data to the sensor database.
