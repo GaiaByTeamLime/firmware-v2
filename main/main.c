@@ -103,16 +103,13 @@ void byte_copy(
 	}
 }
 
-void on_wifi_connect(void) {
-	connection_data_t connection_data;
-	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
-		// delete wifi credentials
-		persistent_storage_erase();
-		// deep sleep (forever)
-		esp_deep_sleep_start();
-	}
+connection_data_t connection_data;
 
+void on_wifi_connect(void) {
+	// collect sensor data (TODO)
 	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+
+	// send data over wifi
 	wifi_send_data_to_server(&connection_data, sensor_values);
 }
 
@@ -130,22 +127,32 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	return ESP_OK;
 }
 
-esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
+esp_err_t read_picc(
+	spi_device_handle_t* handle, connection_data_t* connection_data
+) {
 	PASS_ERROR(rfid_wakeup_mifare_tag(handle), "Unable to wake-up MiFare tag");
 	tag_data_t tag = ndef_create_type();
 	PASS_ERROR(ndef_full_scan(handle, &tag), "Unable to scan MiFare tag");
 
-	connection_data_t connection_data;
-	picc_get_ssid(&tag, connection_data.ssid);
-	picc_get_token(&tag, connection_data.token);
-	picc_get_password(&tag, connection_data.password);
-	picc_get_sid(&tag, connection_data.sid);
+	picc_get_ssid(&tag, &(connection_data->ssid));
+	picc_get_token(&tag, &(connection_data->token));
+	picc_get_password(&tag, &(connection_data->password));
+	picc_get_sid(&tag, &(connection_data->sid));
 
 	// Destroy the tag
 	ndef_destroy_type(&tag);
+	return ESP_OK;
+}
 
+esp_err_t get_and_store_credentials(
+	spi_device_handle_t* handle, connection_data_t* connection_data
+) {
+	// Read nfc tag
+	PASS_ERROR(read_picc(handle, connection_data), "Unable to read PICC");
+
+	// Store credentials
 	PASS_ERROR(
-		persistent_storage_set_connection_data(&connection_data),
+		persistent_storage_set_connection_data(connection_data),
 		"Unable to store into persistent storage"
 	);
 	return ESP_OK;
@@ -156,57 +163,16 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	while (1) {
-		connection_data_t connection_data = {
-			.token = "token",
-			.ssid = "ssid",
-			.password = "password",
-			.sid = "sid",
-		};
-		// persistent_storage_set_connection_data(&connection_data);
-		connection_data_t connection_data2;
-		persistent_storage_get_connection_data(&connection_data2);
-		LOG("SSID: %s", connection_data2.ssid);
-		LOG("TOKEN: %s", connection_data2.token);
-		LOG("PASSWORD: %s", connection_data2.password);
-		LOG("SID: %s", connection_data2.sid);
-		if (persistent_storage_erase() == ESP_OK) {
-			connection_data_t connection_data3;
-			persistent_storage_get_connection_data(&connection_data3);
-			LOG("SSID 2: %s", connection_data3.ssid);
-			LOG("TOKEN 2: %s", connection_data3.token);
-			LOG("PASSWORD 2: %s", connection_data3.password);
-			LOG("SID 2: %s", connection_data3.sid);
-			vTaskDelay(1000 / portTICK_PERIOD_MS);
-		} else {
-			LOG("Could not erase");
-		}
-	}
 	// get wifi credentials
-	get_and_store_credentials(&rfid_handle);
+	if (persistent_storage_get_connection_data(&connection_data) !=
+		ESP_OK) { // has no wifi credentials
+		if (get_and_store_credentials(&rfid_handle, &connection_data) !=
+			ESP_OK) { // got no wifi credentials or could not store them
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		};
+	};
 
-	connection_data_t connection_data;
-	persistent_storage_get_connection_data(&connection_data);
-
+	// connect wifi
 	wifi_start(connection_data.ssid, connection_data.password);
-
-	// char ssid[WIFI_SSID_CHAR_BUFFER_LENGTH];
-	// char password[WIFI_PASSWORD_CHAR_BUFFER_LENGTH];
-	// esp_err_t result = persistent_storage_get_wifi(&ssid, &password);
-
-	// if (result != ESP_OK || /* wifi credentials are not pressent */) {
-	// 	{
-	// 		// read nfc tag
-	// 		if (/* wifi credentials are finaly present*/) {
-	// 			// save wifi credentials
-	// 			persistent_storage_set_wifi(&ssid, &password);
-	// 		} else {
-	// 			// deep sleep (forever)
-	// 			esp_deep_sleep_start();
-	// 		}
-	// 	}
-	// }
-
-	// // connect to wifi
-	// wifi_start(&ssid, &password);
 }

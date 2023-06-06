@@ -13,6 +13,7 @@
 #include <freertos/task.h>
 #include <nvs_flash.h>
 
+#include "persistent_storage.h"
 #include "picc.h"
 #include "wifi.h"
 
@@ -56,14 +57,20 @@ static void wifi_event_handler(
 ) {
 	// Just keep retrying on disconnects
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
-		is_connected = false;
 		ELOG("Disconnected, I'm going to cry now");
-		// // close connection
-		// esp_wifi_deinit();
-		// // esp_event_loop_delete_default();
-		// // esp_netif_destroy_default_wifi();
-		// wifi_disconnected_callback();
-		esp_deep_sleep(SLEEP_DURATION);
+		// close connection
+		esp_wifi_stop();
+		esp_wifi_deinit();
+		if (is_connected) {
+			// deep sleep (60 minutes)
+			esp_deep_sleep(SLEEP_DURATION);
+		} else {
+			// delete wifi credentials
+			persistent_storage_erase();
+
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		}
 	}
 	if (event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
