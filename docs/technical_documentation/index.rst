@@ -36,8 +36,6 @@ Pin Function   Description
 .. |pin07| replace:: The SPI Master-Out-Slave-In pin, used to communicate to the RFID reader.
 .. |pin10| replace:: [Active LOW] The SPI Chip Select 0 pin. This pin is used to enable SPI communication to the RFID device.
 
-**TODO:** pinout image
-
 
 Activity Diagram
 -----------------
