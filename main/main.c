@@ -195,6 +195,7 @@ void app_main(void) {
  	* 0. Soil Data
  	* 1. LDR Data
  	* 2. Battery Data.
+
 	*/
 
 	static uint32_t sensor_data[3] = {0,0,0};
