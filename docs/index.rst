@@ -14,11 +14,11 @@ Here you'll find how to get started along with techinal and API documentation.
 .. |Getting Started| image:: _static/icons/getting_started.png
 .. _Getting Started: getting_started.html
 
-.. |API Reference| image:: _static/icons/api.png
+.. |API Reference| image:: _static/icons/api_reference.png
 .. _API Reference: api_reference/index.html
 
-.. |Technical Documentation| image:: _static/icons/api.png
-.. _Technical Documentation: api_reference/index.html
+.. |Technical Documentation| image:: _static/icons/technical_documentation.png
+.. _Technical Documentation: technical_documentation/index.html
 
 Index
 =====
