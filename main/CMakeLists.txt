@@ -7,6 +7,7 @@ idf_component_register(
         "spi/spi.c"
         "rfid/rfid.c"
         "ndef/ndef.c"
+        "picc/picc.c"
         "sensors/sensors.c"
     INCLUDE_DIRS
         "."
@@ -16,6 +17,7 @@ idf_component_register(
         "spi"
         "rfid"
         "ndef"
+        "picc"
         "sensors"
 )
 

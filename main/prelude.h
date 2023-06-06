@@ -1,9 +1,28 @@
 #ifndef __PRELUDE_HEADER__
 #define __PRELUDE_HEADER__
 
+#define MAX_SSID_LENGTH 32
+#define MAX_PASSWORD_LENGTH 64
+#define SENSOR_ID_LENGTH 27
+#define SENSOR_TOKEN_LENGTH 27
+
 #include <stdbool.h>
 
 #include <esp_log.h>
+
+typedef struct {
+	char ssid[MAX_SSID_LENGTH + 1];
+	char password[MAX_PASSWORD_LENGTH + 1];
+	char sid[SENSOR_ID_LENGTH + 1];
+	char token[SENSOR_TOKEN_LENGTH + 1];
+} connection_data_t;
+
+/***
+ * the duration of the deep sleep (1 hour). If you want to use the deep sleep,
+ * call the function esp_deep_sleep(SLEEP_DURATION) in your code and include the
+ * esp_sleep.h header file
+ */
+#define SLEEP_DURATION (1ULL * 60 * 60 * 1000 * 1000)
 
 // This is kind of reduntent, as the ESP already has log levels internally
 // Though those are runtime checks, this is removed during compile time
@@ -88,4 +107,5 @@
 		} \
 	}
 #endif
+
 #endif

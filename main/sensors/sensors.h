@@ -39,5 +39,4 @@ esp_err_t measure_ldr();
  * This measurement is taken beforehand by calling pull_latest_data(), and comes from pin IO4.
 */
 esp_err_t measure_battery_voltage();
-
 #endif

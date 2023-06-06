@@ -36,11 +36,7 @@ esp_err_t capacity_sensor_init() {
 	PASS_ERROR(
 		gpio_install_isr_service(0), "Could not install GPIO ISR service"
 	);
-	PASS_ERROR(
-		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
-		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
-	);
-
+  
 	gptimer_config_t timer_config = {
 		.clk_src = GPTIMER_CLK_SRC_DEFAULT,
 		.direction = GPTIMER_COUNT_UP,
@@ -64,6 +60,10 @@ esp_err_t battery_measurement_init() {
 	PASS_ERROR(
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
 		"Could not disable internal pulldown resistor."
+
+	PASS_ERROR(
+		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
+		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
 	);
 
 	return ESP_OK;
@@ -81,10 +81,8 @@ esp_err_t measure_battery_voltage() {
 esp_err_t sensors_init() {
 	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
-	PASS_ERROR(
-		battery_measurement_init(), "Could not init battery measurement sensor."
-	);
-
+	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
+  
 	return ESP_OK;
 }
 

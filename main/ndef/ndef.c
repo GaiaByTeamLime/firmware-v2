@@ -5,21 +5,34 @@
 #include "ndef.h"
 #include "prelude.h"
 
+#define USER_DATA_BEGIN 4
+#define BYTES_PER_SECTOR 4
+#define MAX_RETURN_BYTES 16
+
 esp_err_t ndef_full_scan(spi_device_handle_t* handle, tag_data_t* tag) {
-	for (uint8_t sectors = 0; sectors < 9; sectors++) {
+	for (uint8_t sectors = 0; sectors < (MAX_BYTE_COUNT / MAX_RETURN_BYTES);
+		 sectors++) {
 		PASS_ERROR(
 			rfid_read_mifare_tag(
-				handle, 4 + sectors * 4, tag->raw_data + sectors * 16, 16
+				handle,
+				USER_DATA_BEGIN + sectors * BYTES_PER_SECTOR,
+				tag->raw_data + sectors * MAX_RETURN_BYTES,
+				MAX_RETURN_BYTES
 			),
 			"Failed reading sector"
 		);
 	}
+	LOG("NDEF Scanned entire PICC device");
 
 	return ESP_OK;
 }
 
 tag_data_t ndef_create_type() {
 	uint8_t* data_ptr = (uint8_t*)malloc(MAX_BYTE_COUNT);
+	// Clear the array
+	for (uint16_t index = 0; index < MAX_BYTE_COUNT; index++) {
+		data_ptr[index] = 0;
+	}
 	return (tag_data_t
 	){.raw_data = data_ptr,
 	  .raw_data_length = MAX_BYTE_COUNT,
@@ -99,6 +112,7 @@ esp_err_t ndef_parse_record(tag_data_t* tag) {
 
 	// Re-allocate the memory, as we need to increase the array
 	tag->record_count++;
+	LOG("NDEF Parsed %dth NDEF Record", tag->record_count);
 
 	ndef_record_t* record = tag->records + tag->record_count - 1;
 	record->payload = malloc(payload_length - PAYLOAD_PREAMBLE);
@@ -122,5 +136,6 @@ esp_err_t ndef_extract_all_records(
 	) {
 		PASS_ERROR(ndef_parse_record(tag), "Unable to find NDEF record");
 	}
+	LOG("NDEF Exacted All NDEF Records");
 	return ESP_OK;
 }
