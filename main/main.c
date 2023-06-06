@@ -103,14 +103,12 @@ void byte_copy(
 	}
 }
 
-connection_data_t connection_data;
-
 void on_wifi_connect(void) {
 	// collect sensor data (TODO)
 	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
 
 	// send data over wifi
-	wifi_send_data_to_server(&connection_data, sensor_values);
+	wifi_send_data_to_server(sensor_values);
 }
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
@@ -164,15 +162,23 @@ void app_main(void) {
 	setup(&rfid_handle);
 
 	// get wifi credentials
-	if (persistent_storage_get_connection_data(&connection_data) !=
-		ESP_OK) { // has no wifi credentials
-		if (get_and_store_credentials(&rfid_handle, &connection_data) !=
-			ESP_OK) { // got no wifi credentials or could not store them
-			// deep sleep (forever)
-			esp_deep_sleep_start();
-		};
-	};
+	connection_data_t connection_data;
+	// // get wifi credentials
+	// if (persistent_storage_get_connection_data(&connection_data) !=
+	// 	ESP_OK) { // has no wifi credentials
+	// 	if (get_and_store_credentials(&rfid_handle, &connection_data) !=
+	// 		ESP_OK) { // got no wifi credentials or could not store them
+	// 		// deep sleep (forever)
+	// 		esp_deep_sleep_start();
+	// 	};
+	// };
 
+	// // connect wifi
+	// wifi_start(connection_data.ssid, connection_data.password);
+	strcpy(connection_data.ssid, "Sandersnetwerk");
+	strcpy(connection_data.password, "hovy3f94vs73f");
+	strcpy(connection_data.token, "token");
+	strcpy(connection_data.sid, "sid");
 	// connect wifi
-	wifi_start(connection_data.ssid, connection_data.password);
+	wifi_start(&connection_data);
 }
