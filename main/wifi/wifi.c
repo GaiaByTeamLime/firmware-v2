@@ -118,7 +118,7 @@ esp_err_t wifi_send_data_to_server(
 	};
 	LOG("Init begin");
 	esp_http_client_handle_t client = esp_http_client_init(&config);
-	LOG("EEEEEEEEE");
+	LOG("Client handle thing.");
 	PASS_ERROR(
 		esp_http_client_set_method(client, HTTP_METHOD_POST),
 		"Unable to set method"

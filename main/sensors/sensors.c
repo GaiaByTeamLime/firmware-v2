@@ -1,7 +1,7 @@
 #include "sensors.h"
 #include "adc.h"
 
-static uint64_t count = 0;
+static uint64_t soil_capacity_data = 0;
 static bool timer_started = false;
 static gptimer_handle_t timer_handle = NULL;
 
@@ -11,7 +11,7 @@ static void interrupt_handler(void* args) {
 		gptimer_start(timer_handle);
 	} else {
 		gptimer_stop(timer_handle);
-		gptimer_get_raw_count(timer_handle, &count);
+		gptimer_get_raw_count(timer_handle, &soil_capacity_data);
 	}
 	timer_started = !timer_started;
 }
@@ -80,8 +80,8 @@ esp_err_t sensors_init() {
 esp_err_t measure_sensors(uint32_t* data) {
 	pull_latest_data(); // Run through ADC conversion system.
 
-	data[0] = count; // Count is the sensor.c global var for the soil sensor, it
-					 // is filled by a ISR running in the background.
+	data[0] = soil_capacity_data;
+	
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
