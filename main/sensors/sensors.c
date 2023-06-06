@@ -72,12 +72,12 @@ esp_err_t battery_measurement_init() {
 	return ESP_OK;
 }
 
-esp_err_t measure_battery_voltage() {
+esp_err_t measure_battery_voltage(uint32_t* data) {
 	PASS_ERROR(
 		get_adc_data(ADC1_BAT, &bat_data),
 		"Something went wrong on getting the battery voltage level."
 	);
-	LOG("Battery Voltage Measurement: %" PRIu32, bat_data);
+	data[2] = bat_data;
 	return ESP_OK;
 }
 
@@ -89,19 +89,27 @@ esp_err_t sensors_init() {
 	return ESP_OK;
 }
 
-esp_err_t measure_soil_capacity() {
+esp_err_t measure_soil_capacity(uint32_t* data) {
 	if (count != prev_count) {
-		LOG("%d", (int)count);
+		data[0] = count;
 	}
 	prev_count = count;
 
 	return ESP_OK;
 }
 
-esp_err_t measure_ldr() {
+esp_err_t print_measurements(uint32_t* data) {
+	LOG("%d", (int)data[0]);
+	LOG("LDR Sensor measurement:  %" PRIu32, data[1]);
+	LOG("Battery Voltage Measurement: %" PRIu32, data[2]);
+
+	return ESP_OK;
+}
+
+esp_err_t measure_ldr(uint32_t* data) {
 	get_adc_data(ADC1_LDR, &ldr_data);
 	if (prev_ldr_data != ldr_data) {
-		LOG("LDR Sensor measurement:  %" PRIu32, ldr_data);
+		data[1] = ldr_data;
 	}
 
 	return ESP_OK;

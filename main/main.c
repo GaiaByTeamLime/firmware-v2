@@ -188,12 +188,26 @@ void app_main(void) {
 
 	wifi_start(connection_data.ssid, connection_data.password);
 
+	// Debug thing, make better later:
+	/**
+ 	* Data structure, supplied to sensor measure functions as a pointer.
+ 	* The orders of sensors is:
+ 	* 0. Soil Data
+ 	* 1. LDR Data
+ 	* 2. Battery Data.
+	*/
+
+	static uint32_t sensor_data[3] = {0,0,0};
+
   while (true) {
 		pull_latest_data();
 
-		measure_soil_capacity();
-		measure_ldr();
-		measure_battery_voltage();
+		measure_soil_capacity(sensor_data);
+		measure_ldr(sensor_data);
+		measure_battery_voltage(sensor_data);
+
+		print_measurements(sensor_data);
+
 		vTaskDelay(pdMS_TO_TICKS(250));
 	}
 	// char ssid[MAX_SSID_LENGTH] = {0};
