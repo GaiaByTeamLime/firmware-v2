@@ -84,7 +84,6 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 		str[i] = *(((char*)handle->data) + i);
 	}
 	str[handle->data_len] = '\0';
-	LOG("event ID: %i", handle->event_id);
 	LOG("\n%s", str);
 
 	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
