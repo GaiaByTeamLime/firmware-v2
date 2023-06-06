@@ -26,6 +26,7 @@ esp_err_t sensors_init();
  * 
  * @warning Make sure that the given array is the same size as amount of sensors. At the time of writing this,
  * this number is 3.
+ * 
  *
  * @return Potential errors.
 */
