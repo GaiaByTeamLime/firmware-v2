@@ -200,15 +200,9 @@ void app_main(void) {
 	static uint32_t sensor_data[3] = {0,0,0};
 
   while (true) {
-		pull_latest_data();
+		measure_sensors(sensor_data);
 
-		measure_soil_capacity(sensor_data);
-		measure_ldr(sensor_data);
-		measure_battery_voltage(sensor_data);
-
-		print_measurements(sensor_data);
-
-		vTaskDelay(pdMS_TO_TICKS(250));
+		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 	// char ssid[MAX_SSID_LENGTH] = {0};
 	// char password[MAX_PASSWORD_LENGTH] = {0};

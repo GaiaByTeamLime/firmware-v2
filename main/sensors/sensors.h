@@ -19,34 +19,16 @@
 esp_err_t sensors_init();
 
 /**
- * Set data[0] to newest soil capacity measurement value taken from pin IO1 if the new value is different than the old value.
- * This newest measurement will be taken by a interrupt.
+ * Function to take measurements, and place the taken measurements into a array that is given in the form of a pointer.
+ * During debugging mode, 3 log statements will display the first 3 sensor measurements stored in the table given.
  * 
+ * @param data A pointer to a uint32_t array that will contain the sensor data.
+ * 
+ * @warning Make sure that the given array is the same size as amount of sensors. At the time of writing this,
+ * this number is 3.
+ *
  * @return Potential errors.
 */
-esp_err_t measure_soil_capacity(uint32_t* data);
-
-/**
- * Set measured LDR value into into the data array at position 1.
- * This measurement is taken beforehand by calling pull_latest_data(), and comes from pin IO3.
- * 
- * @return Potential errors.
-*/
-esp_err_t measure_ldr(uint32_t* data);
-
-/**
- * Set measured Battery Voltage value into the data array at position 2.
- * This measurement is taken beforehand by calling pull_latest_data(), and comes from pin IO4.
- * 
- * @return Potential errors.
-*/
-esp_err_t measure_battery_voltage(uint32_t* data);
-
-/**
- * Print out values from all 3 (0-2) positions of the data array.
- * 
- * @return Potential errors.
-*/
-esp_err_t print_measurements(uint32_t* data);
+esp_err_t measure_sensors(uint32_t* data);
 
 #endif
