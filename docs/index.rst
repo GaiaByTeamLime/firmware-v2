@@ -11,13 +11,13 @@ Here you'll find how to get started along with techinal and API documentation.
 `Getting Started`_    `API Reference`_    `Technical Documentation`_
 ==================    ================    ==========================
 
-.. |Getting Started| image:: _static/getting_started.png
+.. |Getting Started| image:: _static/icons/getting_started.png
 .. _Getting Started: getting_started.html
 
-.. |API Reference| image:: _static/api.png
+.. |API Reference| image:: _static/icons/api.png
 .. _API Reference: api_reference/index.html
 
-.. |Technical Documentation| image:: _static/api.png
+.. |Technical Documentation| image:: _static/icons/api.png
 .. _Technical Documentation: api_reference/index.html
 
 Index
@@ -27,8 +27,8 @@ Index
     :maxdepth: 2
 
     getting_started
-    pinout
     api_reference/index
+    technical_documentation/index
 
 
 Indices and tables
