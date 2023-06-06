@@ -81,7 +81,7 @@ esp_err_t measure_sensors(uint32_t* data) {
 	pull_latest_data(); // Run through ADC conversion system.
 
 	data[0] = soil_capacity_data;
-	
+
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
