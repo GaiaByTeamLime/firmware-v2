@@ -170,6 +170,7 @@ void app_main(void) {
 			// deep sleep (forever)
 			esp_deep_sleep_start();
 		};
+		LOG("Got credentials from NFC tag");
 	};
 
 	// connect wifi
