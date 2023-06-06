@@ -14,9 +14,9 @@
 #include "picc/picc.h"
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
+#include "sensors/sensors.h"
 #include "spi/spi.h"
 #include "wifi/wifi.h"
-#include "sensors/sensors.h"
 
 char represent_byte(uint8_t byte) {
 	if ((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
@@ -190,17 +190,17 @@ void app_main(void) {
 
 	// Debug thing, make better later:
 	/**
- 	* Data structure, supplied to sensor measure functions as a pointer.
- 	* The orders of sensors is:
- 	* 0. Soil Data
- 	* 1. LDR Data
- 	* 2. Battery Data.
+	* Data structure, supplied to sensor measure functions as a pointer.
+	* The orders of sensors is:
+	* 0. Soil Data
+	* 1. LDR Data
+	* 2. Battery Data.
 
 	*/
 
-	static uint32_t sensor_data[3] = {0,0,0};
+	static uint32_t sensor_data[3] = {0, 0, 0};
 
-  while (true) {
+	while (true) {
 		measure_sensors(sensor_data);
 
 		vTaskDelay(pdMS_TO_TICKS(1000));

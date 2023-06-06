@@ -32,7 +32,7 @@ esp_err_t capacity_sensor_init() {
 	PASS_ERROR(
 		gpio_install_isr_service(0), "Could not install GPIO ISR service"
 	);
-  
+
 	gptimer_config_t timer_config = {
 		.clk_src = GPTIMER_CLK_SRC_DEFAULT,
 		.direction = GPTIMER_COUNT_UP,
@@ -63,7 +63,6 @@ esp_err_t battery_measurement_init() {
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
 		"Could not disable internal pulldown resistor."
 	);
-	
 
 	return ESP_OK;
 }
@@ -71,17 +70,20 @@ esp_err_t battery_measurement_init() {
 esp_err_t sensors_init() {
 	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
-	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
-  
+	PASS_ERROR(
+		battery_measurement_init(), "Could not init battery measurement sensor."
+	);
+
 	return ESP_OK;
 }
 
 esp_err_t measure_sensors(uint32_t* data) {
 	pull_latest_data(); // Run through ADC conversion system.
-	
-	data[0] = count; // Count is the sensor.c global var for the soil sensor, it is filled by a ISR running in the background.
-	get_adc_data(ADC1_LDR,data[1]); // ADC1 LDR sensor input.
-	get_adc_data(ADC1_BAT,data[2]); // ADC1 Battery sensor input.
+
+	data[0] = count; // Count is the sensor.c global var for the soil sensor, it
+					 // is filled by a ISR running in the background.
+	get_adc_data(ADC1_LDR, data[1]); // ADC1 LDR sensor input.
+	get_adc_data(ADC1_BAT, data[2]); // ADC1 Battery sensor input.
 
 	LOG("Soil: %" PRIu32, data[0]);
 	LOG("LDR:  %" PRIu32, data[1]);
