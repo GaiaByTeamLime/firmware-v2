@@ -116,6 +116,20 @@ esp_err_t persistent_storage_get_connection_data(
 }
 
 esp_err_t persistent_storage_erase() {
-	PASS_ERROR(nvs_flash_erase(), "Failed to erase NVS flash");
-	return persistent_storage_init();
+	nvs_handle_t nvs;
+	PASS_ERROR(
+		nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs),
+		"Failed to open NVS storage"
+	);
+	LOG("NVS Open");
+
+	PASS_ERROR(nvs_erase_all(nvs), "Could not erase NVS namespace");
+	LOG("NVS erase namespace");
+
+	PASS_ERROR(nvs_commit(nvs), "Could not commit NVS");
+	LOG("NVS commit");
+
+	nvs_close(nvs);
+
+	return ESP_OK;
 }
