@@ -156,6 +156,32 @@ void app_main(void) {
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
+	while (1) {
+		connection_data_t connection_data = {
+			.token = "token",
+			.ssid = "ssid",
+			.password = "password",
+			.sid = "sid",
+		};
+		// persistent_storage_set_connection_data(&connection_data);
+		connection_data_t connection_data2;
+		persistent_storage_get_connection_data(&connection_data2);
+		LOG("SSID: %s", connection_data2.ssid);
+		LOG("TOKEN: %s", connection_data2.token);
+		LOG("PASSWORD: %s", connection_data2.password);
+		LOG("SID: %s", connection_data2.sid);
+		if (persistent_storage_erase() == ESP_OK) {
+			connection_data_t connection_data3;
+			persistent_storage_get_connection_data(&connection_data3);
+			LOG("SSID 2: %s", connection_data3.ssid);
+			LOG("TOKEN 2: %s", connection_data3.token);
+			LOG("PASSWORD 2: %s", connection_data3.password);
+			LOG("SID 2: %s", connection_data3.sid);
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		} else {
+			LOG("Could not erase");
+		}
+	}
 	// get wifi credentials
 	get_and_store_credentials(&rfid_handle);
 

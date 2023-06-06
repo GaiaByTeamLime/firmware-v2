@@ -115,4 +115,7 @@ esp_err_t persistent_storage_get_connection_data(
 	return ESP_OK;
 }
 
-esp_err_t persistent_storage_erase() { return nvs_flash_erase(); }
+esp_err_t persistent_storage_erase() {
+	PASS_ERROR(nvs_flash_erase(), "Failed to erase NVS flash");
+	return persistent_storage_init();
+}
