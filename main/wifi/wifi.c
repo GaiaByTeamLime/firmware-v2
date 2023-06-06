@@ -226,8 +226,6 @@ esp_err_t wifi_init(void (*success)(void)) {
 	return ESP_OK;
 }
 
-void wifi_stop(void) { esp_wifi_stop(); }
-
 uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
 	char fields[SENSOR_DATA_FIELD_COUNT] = "fihtvHs";
 	char* begin = output;

@@ -52,14 +52,6 @@ esp_err_t wifi_send_data_to_server(uint32_t* sensor_values);
 esp_err_t wifi_start(connection_data_t* data);
 
 /**
-
- * Close the WiFi connection (not in use)
- *
- *
- */
-void wifi_stop(void);
-
-/**
  * Serialise sensor data into a compact JSON data format
  *
  * The sensor data is serialised according to the following format, it also
