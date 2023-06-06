@@ -1,5 +1,4 @@
 #include "prelude.h"
-
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
@@ -100,7 +99,6 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
 	PASS_ERROR(sensors_init(), "Could not initialize sensors");
-
 	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
 
 	return ESP_OK;
@@ -190,6 +188,14 @@ void app_main(void) {
 
 	wifi_start(connection_data.ssid, connection_data.password);
 
+  while (true) {
+		pull_latest_data();
+
+		measure_soil_capacity();
+		measure_ldr();
+		measure_battery_voltage();
+		vTaskDelay(pdMS_TO_TICKS(250));
+	}
 	// char ssid[MAX_SSID_LENGTH] = {0};
 	// char password[MAX_PASSWORD_LENGTH] = {0};
 	// esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
