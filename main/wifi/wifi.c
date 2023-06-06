@@ -19,17 +19,7 @@
 
 bool is_connected = false;
 
-void (*wifi_connected_callback)(void);
-
 connection_data_t connection_data;
-
-/**
- * Ugly function, only here to satisfy the function signiture of FreeRTOS
- */
-void on_wifi_connect_task(void* params) {
-	wifi_connected_callback();
-	vTaskDelete(NULL);
-}
 
 /**
  * The IP event handler
@@ -40,14 +30,12 @@ static void ip_event_handler(
 	// We got a connection!
 	if (event_id == IP_EVENT_STA_GOT_IP) {
 		is_connected = true;
-		xTaskCreate(
-			&on_wifi_connect_task,
-			"OnWifiConnected",
-			configMINIMAL_STACK_SIZE + 5000,
-			NULL,
-			tskIDLE_PRIORITY,
-			NULL
-		);
+
+		// collect sensor data (TODO)
+		uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+
+		// send data over wifi
+		wifi_send_data_to_server(sensor_values);
 	}
 }
 
@@ -195,9 +183,7 @@ esp_err_t wifi_start(connection_data_t* data) {
 	return ESP_OK;
 }
 
-esp_err_t wifi_init(void (*success)(void)) {
-	wifi_connected_callback = success;
-
+esp_err_t wifi_init() {
 	PASS_ERROR(esp_netif_init(), "Failed to init Network Stack");
 	PASS_ERROR(esp_event_loop_create_default(), "Failed to create event loop");
 	esp_netif_create_default_wifi_sta();

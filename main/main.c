@@ -103,14 +103,6 @@ void byte_copy(
 	}
 }
 
-void on_wifi_connect(void) {
-	// collect sensor data (TODO)
-	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
-
-	// send data over wifi
-	wifi_send_data_to_server(sensor_values);
-}
-
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
 	PASS_ERROR(
@@ -120,7 +112,7 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
 
-	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
+	PASS_ERROR(wifi_init(), "Unable to init WiFi");
 
 	return ESP_OK;
 }
