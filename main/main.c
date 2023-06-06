@@ -81,33 +81,6 @@ void print_buffer(uint8_t* buffer, uint16_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
-void on_wifi_connect(void) {
-	connection_data_t connection_data;
-	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
-		// delete wifi credentials
-		persistent_storage_erase();
-		// deep sleep (forever)
-		esp_deep_sleep_start();
-	}
-
-	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
-	wifi_send_data_to_server(&connection_data, sensor_values);
-}
-
-esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
-	PASS_ERROR(adc_init(), "ADC1 Init Error");
-	PASS_ERROR(
-		persistent_storage_init(), "Could not initialize persistent storage"
-	);
-
-	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
-	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
-
-	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
-
-	return ESP_OK;
-}
-
 /**
  * A simple rewrite of memcpy_s.
  *
@@ -128,6 +101,33 @@ void byte_copy(
 	for (uint8_t index = 0; index < max_copy; index++) {
 		dest[index] = src[index];
 	}
+}
+
+esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
+	PASS_ERROR(adc_init(), "ADC1 Init Error");
+	PASS_ERROR(
+		persistent_storage_init(), "Could not initialize persistent storage"
+	);
+
+	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
+	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
+
+	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
+
+	return ESP_OK;
+}
+
+void on_wifi_connect(void) {
+	connection_data_t connection_data;
+	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
+		// delete wifi credentials
+		persistent_storage_erase();
+		// deep sleep (forever)
+		esp_deep_sleep_start();
+	}
+
+	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+	wifi_send_data_to_server(&connection_data, sensor_values);
 }
 
 esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
