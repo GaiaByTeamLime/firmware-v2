@@ -51,7 +51,7 @@ This diagram describes the flow of the gaia plantsensor app.
 Block Diagram
 -------------
 
-This diagram shows the internal relations between components in the system
+This diagram shows the internal relations between components in the system.
 
 .. image:: ../_static/diagrams/block_diagram.jpg
     :alt: Gaia plantsensor block diagram
