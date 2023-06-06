@@ -116,19 +116,24 @@ esp_err_t wifi_send_data_to_server(
 		.event_handler = http_event_handle,
 		.crt_bundle_attach = esp_crt_bundle_attach,
 	};
+	LOG("Init begin");
 	esp_http_client_handle_t client = esp_http_client_init(&config);
+	LOG("EEEEEEEEE");
 	PASS_ERROR(
 		esp_http_client_set_method(client, HTTP_METHOD_POST),
 		"Unable to set method"
 	);
+	LOG("Method set");
 	PASS_ERROR(
 		esp_http_client_set_post_field(client, post_data, post_data_length - 1),
 		"Unable to set post data"
 	); // We subtract one as we want to send the length without the NULL byte
+	LOG("Post set");
 	PASS_ERROR(
 		esp_http_client_set_header(client, "Content-Type", "application/json"),
 		"Unable to set content type"
 	);
+	LOG("Header set");
 	PASS_ERROR(
 		esp_http_client_set_header(client, "Authorization", auth_header),
 		"Unable to set authorization"

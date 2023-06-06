@@ -43,6 +43,12 @@ esp_err_t capacity_sensor_init() {
 		.resolution_hz = CAPACITY_SENSOR_GPTIMER_RESOLUTION_HZ,
 		.flags.intr_shared = 0,
 	};
+
+	PASS_ERROR(
+		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
+		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
+	);
+
 	PASS_ERROR(
 		gptimer_new_timer(&timer_config, &timer_handle),
 		"Could not create new timer"
@@ -60,11 +66,8 @@ esp_err_t battery_measurement_init() {
 	PASS_ERROR(
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
 		"Could not disable internal pulldown resistor."
-
-	PASS_ERROR(
-		gpio_isr_handler_add(CAPACITY_SENSOR_PIN, interrupt_handler, NULL),
-		"Could not add gpio isr handler for CAPACITY_SENSOR_PIN"
 	);
+	
 
 	return ESP_OK;
 }
@@ -74,7 +77,7 @@ esp_err_t measure_battery_voltage() {
 		get_adc_data(ADC1_BAT, &bat_data),
 		"Something went wrong on getting the battery voltage level."
 	);
-	LOG("Battery Voltage Measurement: %u", bat_data);
+	LOG("Battery Voltage Measurement: %" PRIu32, bat_data);
 	return ESP_OK;
 }
 
@@ -98,7 +101,7 @@ esp_err_t measure_soil_capacity() {
 esp_err_t measure_ldr() {
 	get_adc_data(ADC1_LDR, &ldr_data);
 	if (prev_ldr_data != ldr_data) {
-		LOG("LDR Sensor measurement: %u", ldr_data);
+		LOG("LDR Sensor measurement:  %" PRIu32, ldr_data);
 	}
 
 	return ESP_OK;
