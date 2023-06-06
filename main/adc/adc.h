@@ -10,20 +10,20 @@
  * to change this define
  *
  */
-#define ADC1_PORTS_AMOUNT 1
+#define ADC1_PORTS 2
 
 /**
  * Enum to select the corresponding adc port
  *
  * @warning If you add or remove an item from this enum, you need to change the
- * ADC1_PORTS_AMOUNT with the amount of items in this enum. Also, you need to
+ * ADC1_PORTS with the amount of items in this enum. Also, you need to
  * add or remove the corresponding port from the `adc1_ports` array in adc.c.
  * The 0 index of the array is the 0 index of the enum
  *
  */
 typedef enum {
-	ADC1_LDR, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO
-				 only port */
+	ADC1_LDR = 0, /*!< Is connected to PORT 3 from the esp32. */
+	ADC1_BAT = 1, /*!< Is connected to PORT 4 from the esp32. */
 } adc1_port_t;
 
 /**

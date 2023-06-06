@@ -1,5 +1,4 @@
 #include "prelude.h"
-
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
@@ -15,6 +14,7 @@
 #include "picc/picc.h"
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
+#include "sensors/sensors.h"
 #include "spi/spi.h"
 #include "wifi/wifi.h"
 
@@ -98,7 +98,7 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
-
+	PASS_ERROR(sensors_init(), "Could not initialize sensors");
 	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
 
 	return ESP_OK;
@@ -155,9 +155,56 @@ void app_main(void) {
 
 	connection_data_t connection_data;
 	persistent_storage_get_connection_data(&connection_data);
+	// // Wake up the rfid reader
+	// rfid_wakeup_mifare_tag(&rfid_handle);
+
+	// tag_data_t tag = ndef_create_type();
+
+	// ndef_extract_all_records(&rfid_handle, &tag);
+
+	// print_buffer(tag.raw_data, tag.raw_data_length, 4);
+
+	// // Print out all records
+	// LOG("Record count: %d", tag.record_count);
+	// for (uint8_t record_index = 0; record_index < tag.record_count;
+	// 	 record_index++) {
+	// 	ndef_record_t record = tag.records[record_index];
+	// 	LOG("Record (payload length=%d):", record.payload_size);
+	// 	for (uint8_t byte_index = 0; byte_index < record.payload_size;
+	// 		 byte_index++) {
+	// 		uint8_t data = record.payload[byte_index];
+	// 		LOG("\t0x%02x = %c", data, represent_byte(data));
+	// 	}
+	// }
+	// LOG("End of records");
+
+	// ndef_destroy_type(&tag);
+
+	// adc_init();
+	// pull_latest_data();
+	// uint32_t data = 0;
+	// get_adc_data(ADC1_LDR, &data);
+	// LOG("%d", (int)data);
 
 	wifi_start(connection_data.ssid, connection_data.password);
 
+	// Debug thing, make better later:
+	/**
+	* Data structure, supplied to sensor measure functions as a pointer.
+	* The orders of sensors is:
+	* 0. Soil Data
+	* 1. LDR Data
+	* 2. Battery Data.
+
+	*/
+
+	static uint32_t sensor_data[3] = {0, 0, 0};
+
+	while (true) {
+		measure_sensors(sensor_data);
+
+		vTaskDelay(pdMS_TO_TICKS(1000));
+	}
 	// char ssid[MAX_SSID_LENGTH] = {0};
 	// char password[MAX_PASSWORD_LENGTH] = {0};
 	// esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
