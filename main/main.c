@@ -103,6 +103,19 @@ void byte_copy(
 	}
 }
 
+void on_wifi_connect(void) {
+	connection_data_t connection_data;
+	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
+		// delete wifi credentials
+		persistent_storage_erase();
+		// deep sleep (forever)
+		esp_deep_sleep_start();
+	}
+
+	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+	wifi_send_data_to_server(&connection_data, sensor_values);
+}
+
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(adc_init(), "ADC1 Init Error");
 	PASS_ERROR(
@@ -115,19 +128,6 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
 
 	return ESP_OK;
-}
-
-void on_wifi_connect(void) {
-	connection_data_t connection_data;
-	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
-		// delete wifi credentials
-		persistent_storage_erase();
-		// deep sleep (forever)
-		esp_deep_sleep_start();
-	}
-
-	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
-	wifi_send_data_to_server(&connection_data, sensor_values);
 }
 
 esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
