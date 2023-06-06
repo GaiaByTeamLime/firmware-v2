@@ -22,8 +22,8 @@
  *
  */
 typedef enum {
-	ADC1_LDR = 0, /*!< Is connected to PORT 3 from the esp32, because it is a GPIO only port */
-	ADC1_BAT = 1,
+	ADC1_LDR = 0, /*!< Is connected to PORT 3 from the esp32. */
+	ADC1_BAT = 1, /*!< Is connected to PORT 4 from the esp32. */
 } adc1_port_t;
 
 /**
