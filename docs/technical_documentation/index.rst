@@ -42,7 +42,7 @@ Pin Function   Description
 Activity Diagram
 -----------------
 
-Here you'll find the activity diagram.
+This diagram describes the flow of the gaia plantsensor app.
 
 .. image:: ../_static/diagrams/activity_diagram.jpg
     :alt: Gaia plantsensor activity diagram
@@ -51,7 +51,7 @@ Here you'll find the activity diagram.
 Block Diagram
 -------------
 
-Block diagram
+This diagram shows the internal relations between components in the system
 
 .. image:: ../_static/diagrams/block_diagram.jpg
     :alt: Gaia plantsensor block diagram
