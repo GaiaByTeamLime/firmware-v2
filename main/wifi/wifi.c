@@ -58,7 +58,6 @@ static void wifi_event_handler(
 	// Just keep retrying on disconnects
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
 		ELOG("Disconnected, I'm going to cry now");
-		// close connection
 		esp_wifi_stop();
 		esp_wifi_deinit();
 		if (is_connected) {
@@ -83,7 +82,13 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 		str[i] = *(((char*)handle->data) + i);
 	}
 	str[handle->data_len] = '\0';
+	LOG("event ID: %i", handle->event_id);
 	LOG("\n%s", str);
+
+	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
+		// close connection
+		esp_wifi_disconnect();
+		}
 	return ESP_OK;
 }
 
@@ -147,9 +152,7 @@ esp_err_t wifi_send_data_to_server(
 	);
 	LOG("Generated request");
 
-	PASS_ERROR(esp_http_client_perform(client), "Unable to perform request");
-
-	return esp_wifi_disconnect();
+	return esp_http_client_perform(client);
 }
 
 esp_err_t wifi_start(const char* ssid, const char* password) {
