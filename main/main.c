@@ -132,10 +132,10 @@ esp_err_t read_picc(
 	tag_data_t tag = ndef_create_type();
 	PASS_ERROR(ndef_full_scan(handle, &tag), "Unable to scan MiFare tag");
 
-	picc_get_ssid(&tag, &(connection_data->ssid));
-	picc_get_token(&tag, &(connection_data->token));
-	picc_get_password(&tag, &(connection_data->password));
-	picc_get_sid(&tag, &(connection_data->sid));
+	picc_get_ssid(&tag, connection_data->ssid);
+	picc_get_token(&tag, connection_data->token);
+	picc_get_password(&tag, connection_data->password);
+	picc_get_sid(&tag, connection_data->sid);
 
 	// Destroy the tag
 	ndef_destroy_type(&tag);
