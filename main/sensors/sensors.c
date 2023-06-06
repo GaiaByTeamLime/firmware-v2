@@ -82,8 +82,8 @@ esp_err_t measure_sensors(uint32_t* data) {
 
 	data[0] = count; // Count is the sensor.c global var for the soil sensor, it
 					 // is filled by a ISR running in the background.
-	get_adc_data(ADC1_LDR, data[1]); // ADC1 LDR sensor input.
-	get_adc_data(ADC1_BAT, data[2]); // ADC1 Battery sensor input.
+	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
+	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
 	LOG("Soil: %" PRIu32, data[0]);
 	LOG("LDR:  %" PRIu32, data[1]);
