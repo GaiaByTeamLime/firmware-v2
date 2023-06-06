@@ -147,7 +147,9 @@ esp_err_t wifi_send_data_to_server(
 	);
 	LOG("Generated request");
 
-	return esp_http_client_perform(client);
+	PASS_ERROR(esp_http_client_perform(client), "Unable to perform request");
+
+	return esp_wifi_disconnect();
 }
 
 esp_err_t wifi_start(const char* ssid, const char* password) {
