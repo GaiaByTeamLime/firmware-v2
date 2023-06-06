@@ -163,22 +163,15 @@ void app_main(void) {
 
 	// get wifi credentials
 	connection_data_t connection_data;
-	// // get wifi credentials
-	// if (persistent_storage_get_connection_data(&connection_data) !=
-	// 	ESP_OK) { // has no wifi credentials
-	// 	if (get_and_store_credentials(&rfid_handle, &connection_data) !=
-	// 		ESP_OK) { // got no wifi credentials or could not store them
-	// 		// deep sleep (forever)
-	// 		esp_deep_sleep_start();
-	// 	};
-	// };
+	if (persistent_storage_get_connection_data(&connection_data) !=
+		ESP_OK) { // has no wifi credentials
+		if (get_and_store_credentials(&rfid_handle, &connection_data) !=
+			ESP_OK) { // got no wifi credentials or could not store them
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		};
+	};
 
-	// // connect wifi
-	// wifi_start(connection_data.ssid, connection_data.password);
-	strcpy(connection_data.ssid, "Sandersnetwerk");
-	strcpy(connection_data.password, "hovy3f94vs73f");
-	strcpy(connection_data.token, "token");
-	strcpy(connection_data.sid, "sid");
 	// connect wifi
 	wifi_start(&connection_data);
 }
