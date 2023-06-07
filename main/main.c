@@ -1,5 +1,4 @@
 #include "prelude.h"
-
 #include <driver/spi_common.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
@@ -16,6 +15,7 @@
 #include "picc/picc.h"
 #include "rfid/rfid.h"
 #include "rfid/rfid_pcd_register_types.h"
+#include "sensors/sensors.h"
 #include "spi/spi.h"
 #include "wifi/wifi.h"
 
