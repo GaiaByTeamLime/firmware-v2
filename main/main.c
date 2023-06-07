@@ -3,6 +3,7 @@
 #include <driver/spi_master.h>
 #include <esp_err.h>
 #include <esp_heap_caps.h>
+#include <esp_sleep.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
@@ -80,30 +81,6 @@ void print_buffer(uint8_t* buffer, uint16_t size, uint8_t address) {
 	LOG("+----+-------------+---------+");
 }
 
-void on_wifi_connect(void) {
-	connection_data_t connection_data;
-	if (persistent_storage_get_connection_data(&connection_data) != ESP_OK) {
-		// TODO: Enter sleep mode
-	}
-
-	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
-	wifi_send_data_to_server(&connection_data, sensor_values);
-}
-
-esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
-	PASS_ERROR(adc_init(), "ADC1 Init Error");
-	PASS_ERROR(
-		persistent_storage_init(), "Could not initialize persistent storage"
-	);
-
-	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
-	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
-	PASS_ERROR(sensors_init(), "Could not initialize sensors");
-	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
-
-	return ESP_OK;
-}
-
 /**
  * A simple rewrite of memcpy_s.
  *
@@ -126,106 +103,76 @@ void byte_copy(
 	}
 }
 
-esp_err_t get_and_store_credentials(spi_device_handle_t* handle) {
+void on_wifi_connect(void) {
+	// collect sensor data (TODO)
+	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+
+	// send data over wifi
+	wifi_send_data_to_server(sensor_values);
+}
+
+esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
+	PASS_ERROR(adc_init(), "ADC1 Init Error");
+	PASS_ERROR(
+		persistent_storage_init(), "Could not initialize persistent storage"
+	);
+
+	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
+	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
+
+	PASS_ERROR(wifi_init(&on_wifi_connect), "Unable to init WiFi");
+
+	return ESP_OK;
+}
+
+esp_err_t read_picc(
+	spi_device_handle_t* handle, connection_data_t* connection_data
+) {
 	PASS_ERROR(rfid_wakeup_mifare_tag(handle), "Unable to wake-up MiFare tag");
 	tag_data_t tag = ndef_create_type();
 	PASS_ERROR(ndef_full_scan(handle, &tag), "Unable to scan MiFare tag");
 
-	connection_data_t connection_data;
-	picc_get_ssid(&tag, connection_data.ssid);
-	picc_get_token(&tag, connection_data.token);
-	picc_get_password(&tag, connection_data.password);
-	picc_get_sid(&tag, connection_data.sid);
+	picc_get_ssid(&tag, connection_data->ssid);
+	picc_get_token(&tag, connection_data->token);
+	picc_get_password(&tag, connection_data->password);
+	picc_get_sid(&tag, connection_data->sid);
 
 	// Destroy the tag
 	ndef_destroy_type(&tag);
+	return ESP_OK;
+}
 
+esp_err_t get_and_store_credentials(
+	spi_device_handle_t* handle, connection_data_t* connection_data
+) {
+	// Read nfc tag
+	PASS_ERROR(read_picc(handle, connection_data), "Unable to read PICC");
+
+	// Store credentials
 	PASS_ERROR(
-		persistent_storage_set_connection_data(&connection_data),
+		persistent_storage_set_connection_data(connection_data),
 		"Unable to store into persistent storage"
 	);
 	return ESP_OK;
 }
 
 void app_main(void) {
+	// setup
 	spi_device_handle_t rfid_handle = {0};
 	setup(&rfid_handle);
 
-	get_and_store_credentials(&rfid_handle);
-
+	// get wifi credentials
 	connection_data_t connection_data;
-	persistent_storage_get_connection_data(&connection_data);
-	// // Wake up the rfid reader
-	// rfid_wakeup_mifare_tag(&rfid_handle);
+	if (persistent_storage_get_connection_data(&connection_data) !=
+		ESP_OK) { // has no wifi credentials
+		if (get_and_store_credentials(&rfid_handle, &connection_data) !=
+			ESP_OK) { // got no wifi credentials or could not store them
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		};
+		LOG("Got credentials from NFC tag");
+	};
 
-	// tag_data_t tag = ndef_create_type();
-
-	// ndef_extract_all_records(&rfid_handle, &tag);
-
-	// print_buffer(tag.raw_data, tag.raw_data_length, 4);
-
-	// // Print out all records
-	// LOG("Record count: %d", tag.record_count);
-	// for (uint8_t record_index = 0; record_index < tag.record_count;
-	// 	 record_index++) {
-	// 	ndef_record_t record = tag.records[record_index];
-	// 	LOG("Record (payload length=%d):", record.payload_size);
-	// 	for (uint8_t byte_index = 0; byte_index < record.payload_size;
-	// 		 byte_index++) {
-	// 		uint8_t data = record.payload[byte_index];
-	// 		LOG("\t0x%02x = %c", data, represent_byte(data));
-	// 	}
-	// }
-	// LOG("End of records");
-
-	// ndef_destroy_type(&tag);
-
-	// adc_init();
-	// pull_latest_data();
-	// uint32_t data = 0;
-	// get_adc_data(ADC1_LDR, &data);
-	// LOG("%d", (int)data);
-
-	wifi_start(connection_data.ssid, connection_data.password);
-
-	// Debug thing, make better later:
-	/**
-	* Data structure, supplied to sensor measure functions as a pointer.
-	* The orders of sensors is:
-	* 0. Soil Data
-	* 1. LDR Data
-	* 2. Battery Data.
-
-	*/
-
-	static uint32_t sensor_data[3] = {0, 0, 0};
-
-	while (true) {
-		measure_sensors(sensor_data);
-
-		vTaskDelay(pdMS_TO_TICKS(1000));
-	}
-	// char ssid[MAX_SSID_LENGTH] = {0};
-	// char password[MAX_PASSWORD_LENGTH] = {0};
-	// esp_err_t cred_err = get_and_store_credentials(&rfid_handle);
-	// if (cred_err != ESP_OK) {
-	// 	ELOG("Unable to retrieve store credentials in NVS");
-	// }
-	// esp_err_t persistent_err = persistent_storage_get_wifi(ssid, password);
-	// if (persistent_err != ESP_OK) {
-	// 	ELOG("Unable to retrieve credentials from NVS");
-	// }
-	//
-	// // Connect to WiFi
-	// wifi_start(ssid, password);
-	//
-	// while (1) {
-	// 	pull_latest_data();
-	// 	uint32_t adc_data;
-	// 	esp_err_t error_code = get_adc_data(ADC1_LDR, &adc_data);
-	// 	if (error_code == ESP_OK) {
-	// 		LOG("LDR data: %" PRIu32, adc_data);
-	// 	}
-	// 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	// }
+	// connect wifi
+	wifi_start(&connection_data);
 }

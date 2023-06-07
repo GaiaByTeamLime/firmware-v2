@@ -25,8 +25,7 @@
  * At the current moment, we only support WPA2-PSK encryption method
  *
  * @param success The callback function to be invoked once the device connected
- * to a network
- * @return Any error the WiFi driver may have encountered
+ * to a network* @ return Any error the WiFi driver may have encountered
  */
 esp_err_t wifi_init(void (*success)(void));
 
@@ -35,13 +34,10 @@ esp_err_t wifi_init(void (*success)(void));
  *
  * @see wifi_serialise_data
  *
- * @param connection_data The configuration data used to connect to the server
  * @param sensor_values The sensor values, the length of this array must equal
  * `SENSOR_DATA_FIELD_COUNT`
  */
-esp_err_t wifi_send_data_to_server(
-	connection_data_t* connection_data, uint32_t* sensor_values
-);
+esp_err_t wifi_send_data_to_server(uint32_t* sensor_values);
 
 /**
  * Start & connect to the WiFi network
@@ -50,11 +46,10 @@ esp_err_t wifi_send_data_to_server(
  * invokes the start of the network. The event listener then connects to the
  * network
  *
- * @param ssid The SSID of the WiFi network to connect to
- * @param password The password of the WiFi network to connect to
+ * @param data The configuration data used to connect to the server
  * @return Any error the WiFi driver may have encountered
  */
-esp_err_t wifi_start(const char* ssid, const char* password);
+esp_err_t wifi_start(connection_data_t* data);
 
 /**
  * Serialise sensor data into a compact JSON data format

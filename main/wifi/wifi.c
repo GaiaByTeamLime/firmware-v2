@@ -13,12 +13,15 @@
 #include <freertos/task.h>
 #include <nvs_flash.h>
 
+#include "persistent_storage.h"
 #include "picc.h"
 #include "wifi.h"
 
 bool is_connected = false;
 
 void (*wifi_connected_callback)(void);
+
+connection_data_t* connection_data;
 
 /**
  * Ugly function, only here to satisfy the function signiture of FreeRTOS
@@ -56,9 +59,19 @@ static void wifi_event_handler(
 ) {
 	// Just keep retrying on disconnects
 	if (event_id == WIFI_EVENT_STA_DISCONNECTED) {
-		is_connected = false;
 		ELOG("Disconnected, I'm going to cry now");
-		esp_deep_sleep(SLEEP_DURATION);
+		esp_wifi_stop();
+		esp_wifi_deinit();
+		if (is_connected) {
+			// deep sleep (60 minutes)
+			esp_deep_sleep(SLEEP_DURATION);
+		} else {
+			// delete wifi credentials
+			persistent_storage_erase();
+
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		}
 	}
 	if (event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
@@ -72,6 +85,11 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 	}
 	str[handle->data_len] = '\0';
 	LOG("\n%s", str);
+
+	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
+		// close connection
+		esp_wifi_disconnect();
+	}
 	return ESP_OK;
 }
 
@@ -91,9 +109,7 @@ void strcpy_iterate(char** dest, char* source) {
 	}
 }
 
-esp_err_t wifi_send_data_to_server(
-	connection_data_t* connection_data, uint32_t* sensor_values
-) {
+esp_err_t wifi_send_data_to_server(uint32_t* sensor_values) {
 	char post_data[SERIALISED_DATA_MAX_BYTES] = {0};
 	uint32_t post_data_length = wifi_serialise_data(sensor_values, post_data);
 	LOG("Serialised WiFi post data");
@@ -143,7 +159,10 @@ esp_err_t wifi_send_data_to_server(
 	return esp_http_client_perform(client);
 }
 
-esp_err_t wifi_start(const char* ssid, const char* password) {
+esp_err_t wifi_start(connection_data_t* data) {
+	connection_data = data;
+	char* ssid = data->ssid;
+	char* password = data->password;
 	// Create a config struct
 	wifi_config_t wifi_config = {
 		.sta = {
