@@ -85,9 +85,5 @@ esp_err_t measure_sensors(uint32_t* data) {
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
-	LOG("Soil: %" PRIu32, data[0]);
-	LOG("LDR:  %" PRIu32, data[1]);
-	LOG("Batt: %" PRIu32, data[2]);
-
 	return ESP_OK;
 }

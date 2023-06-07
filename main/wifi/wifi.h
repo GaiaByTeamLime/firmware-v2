@@ -8,7 +8,7 @@
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
 
-#define SENSOR_DATA_FIELD_COUNT 7
+#define SENSOR_DATA_FIELD_COUNT 4
 #define JSON_WRAPPER_BYTES 2
 #define BYTES_PER_NUMBER 10
 #define BYTES_PER_FIELD (4 + BYTES_PER_NUMBER + 1)
@@ -61,11 +61,8 @@ esp_err_t wifi_start(connection_data_t* data);
  * |----------------|------------------|------|---------------|
  * | 1 | f | Firmware Version | 2 |
  * | 2 | i | Illumination | x |
- * | 3 | h | Humidity | x |
- * | 4 | t | Temperature | x |
- * | 5 | v | Voltage | x |
- * | 6 | H | Soil Humidity | x |
- * | 7 | s | Soil Salt | x |
+ * | 3 | s | Soil Humidity | x |
+ * | 4 | v | Voltage | x |
  *
  * x = the value of the sensor
  *
