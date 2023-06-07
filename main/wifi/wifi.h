@@ -60,8 +60,8 @@ esp_err_t wifi_start(connection_data_t* data);
  * | Index in array | Serialised field | Name | Expected Data |
  * |----------------|------------------|------|---------------|
  * | 1 | f | Firmware Version | 2 |
- * | 2 | i | Illumination | x |
- * | 3 | s | Soil Humidity | x |
+ * | 2 | s | Soil Humidity | x |
+ * | 3 | i | Illumination | x |
  * | 4 | v | Voltage | x |
  *
  * x = the value of the sensor
@@ -70,6 +70,9 @@ esp_err_t wifi_start(connection_data_t* data);
  * SENSOR_DATA_FIELD_COUNT
  * @note The same applies for the return value, the length of the buffer MUST be
  * AT LEAST SERIALISED_DATA_MAX_BYTES
+ * @note If you want to add more fields, you have to change the value of
+ * SENSOR_DATA_FIELD_COUNT and the fields char array in this function. Note that
+ * the keys are in the right order.
  *
  * @param sensor_data A pointer to an array of sensor data
  * @param output A pointer to an output char buffer, the serialised data gets

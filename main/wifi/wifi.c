@@ -231,7 +231,7 @@ esp_err_t wifi_init(void (*success)(void)) {
 }
 
 uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
-	char fields[SENSOR_DATA_FIELD_COUNT] = "fisv";
+	char fields[SENSOR_DATA_FIELD_COUNT] = "fsiv";
 	char* begin = output;
 
 	*(output++) = '{';
