@@ -105,10 +105,20 @@ void byte_copy(
 
 void on_wifi_connect(void) {
 	// collect sensor data (TODO)
-	uint32_t sensor_values[] = {2, 69, 420, 1, 2, 3, 4};
+	uint32_t sensor_data[SENSOR_DATA_FIELD_COUNT] = {0};
+
+	// add version number
+	sensor_data[0] = 2;
+
+	measure_sensors(&sensor_data[1]);
+
+	LOG("Version: %" PRId32, sensor_data[0]);
+	LOG("Soil: %" PRIu32, sensor_data[1]);
+	LOG("LDR:  %" PRIu32, sensor_data[2]);
+	LOG("Batt: %" PRIu32, sensor_data[3]);
 
 	// send data over wifi
-	wifi_send_data_to_server(sensor_values);
+	wifi_send_data_to_server(sensor_data);
 }
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {

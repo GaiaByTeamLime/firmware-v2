@@ -8,7 +8,7 @@
 #define MAX_SSID_LENGTH 32
 #define MAX_PASSWORD_LENGTH 64
 
-#define SENSOR_DATA_FIELD_COUNT 7
+#define SENSOR_DATA_FIELD_COUNT 4
 #define JSON_WRAPPER_BYTES 2
 #define BYTES_PER_NUMBER 10
 #define BYTES_PER_FIELD (4 + BYTES_PER_NUMBER + 1)
@@ -60,12 +60,9 @@ esp_err_t wifi_start(connection_data_t* data);
  * | Index in array | Serialised field | Name | Expected Data |
  * |----------------|------------------|------|---------------|
  * | 1 | f | Firmware Version | 2 |
- * | 2 | i | Illumination | x |
- * | 3 | h | Humidity | x |
- * | 4 | t | Temperature | x |
- * | 5 | v | Voltage | x |
- * | 6 | H | Soil Humidity | x |
- * | 7 | s | Soil Salt | x |
+ * | 2 | s | Soil Humidity | x |
+ * | 3 | i | Illumination | x |
+ * | 4 | v | Voltage | x |
  *
  * x = the value of the sensor
  *
@@ -73,6 +70,9 @@ esp_err_t wifi_start(connection_data_t* data);
  * SENSOR_DATA_FIELD_COUNT
  * @note The same applies for the return value, the length of the buffer MUST be
  * AT LEAST SERIALISED_DATA_MAX_BYTES
+ * @note If you want to add more fields, you have to change the value of
+ * SENSOR_DATA_FIELD_COUNT and the fields char array in this function. Note that
+ * the keys are in the right order.
  *
  * @param sensor_data A pointer to an array of sensor data
  * @param output A pointer to an output char buffer, the serialised data gets
