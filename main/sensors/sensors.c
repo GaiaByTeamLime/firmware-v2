@@ -18,7 +18,7 @@ static void interrupt_handler(void* args) {
 	timer_started = !timer_started;
 	
 	// Only measure 5 times
-	if (soil_counter >= 5) {
+	if (soil_counter >= SOIL_SENSOR_MEASUREMENT_COUNT) {
 		gpio_isr_handler_remove(CAPACITY_SENSOR_PIN);
 	}
 }
@@ -105,5 +105,6 @@ esp_err_t measure_sensors(uint32_t* data) {
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
+	gpio_uninstall_isr_service();
 	return ESP_OK;
 }
