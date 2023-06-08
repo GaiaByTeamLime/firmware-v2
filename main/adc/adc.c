@@ -52,7 +52,10 @@ esp_err_t adc_init(void) {
 		.atten = ADC1_ATTEN,
 		.bitwidth = ADC1_BITWIDTH,
 	};
-	adc_cali_create_scheme_curve_fitting(&cali_config, &adc1_cali_handle);
+	PASS_ERROR(
+		adc_cali_create_scheme_curve_fitting(&cali_config, &adc1_cali_handle),
+		"ADC1 calibration init failed"
+	);
 
 	return ESP_OK;
 }
