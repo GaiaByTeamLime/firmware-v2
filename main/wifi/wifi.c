@@ -248,7 +248,9 @@ uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
 		{
 			output++;
 			value /= 10;
-		} while (value);
+		}
+		while (value)
+			;
 		char* end_of_number = output; // Save the current position for later
 		output--; // Decrement one, now we are at the place the last digit
 				  // should be placed
@@ -258,7 +260,9 @@ uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
 		{
 			*(output--) = '0' + (value % 10);
 			value /= 10;
-		} while (value);
+		}
+		while (value)
+			;
 		// Restore the pointer
 		output = end_of_number;
 		*(output++) = ',';
