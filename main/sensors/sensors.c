@@ -4,6 +4,7 @@
 static uint64_t soil_capacity_data = 0;
 static bool timer_started = false;
 static gptimer_handle_t timer_handle = NULL;
+static uint8_t soil_counter = 0;
 
 static void interrupt_handler(void* args) {
 	if (!timer_started) {
@@ -12,11 +13,29 @@ static void interrupt_handler(void* args) {
 	} else {
 		gptimer_stop(timer_handle);
 		gptimer_get_raw_count(timer_handle, &soil_capacity_data);
+		soil_counter++;
 	}
 	timer_started = !timer_started;
+	if(soil_counter>=5){
+		gpio_uninstall_isr_service();
+		gpio_isr_handler_remove(CAPACITY_SENSOR_PIN);
+	}
 }
 
 esp_err_t capacity_sensor_init() {
+	PASS_ERROR(
+		gpio_set_direction(CAPACITY_SENSOR_POWER_PIN, GPIO_MODE_OUTPUT),
+		"Could not set CAPACITY_SENSOR_POWER_PIN to mode output"
+	);
+	PASS_ERROR(
+		gpio_set_level(CAPACITY_SENSOR_POWER_PIN,1),
+		"Could not set CAPACITY_SENSOR_PIN level to high. (1)"
+	);
+	PASS_ERROR(
+		gpio_pullup_en(CAPACITY_SENSOR_POWER_PIN),
+		"Could not enable pullup at CAPACITY_SENSOR_POWER_PIN"
+	);
+
 	PASS_ERROR(
 		gpio_set_direction(CAPACITY_SENSOR_PIN, GPIO_MODE_INPUT),
 		"Could not set CAPACITY_SENSOR_PIN to mode input"
