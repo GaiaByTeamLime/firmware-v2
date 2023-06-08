@@ -245,9 +245,12 @@ uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
 		uint32_t value = sensor_data[field_index];
 
 		// Increment the pointer to the end of the serialised number
-		while (value) {
+		while (1) {
 			output++;
 			value /= 10;
+			if (!value) {
+				break;
+			}
 		}
 		char* end_of_number = output; // Save the current position for later
 		output--; // Decrement one, now we are at the place the last digit
@@ -255,9 +258,12 @@ uint32_t wifi_serialise_data(uint32_t* sensor_data, char* output) {
 		// Serialise the number, this process starts at the LSB, so we have to
 		// move the pointer backwards, otherwise the number is reverted
 		value = sensor_data[field_index];
-		while (value) {
+		while (1) {
 			*(output--) = '0' + (value % 10);
 			value /= 10;
+			if (!value) {
+				break;
+			}
 		}
 		// Restore the pointer
 		output = end_of_number;
