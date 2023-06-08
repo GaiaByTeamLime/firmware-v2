@@ -78,8 +78,8 @@ static void wifi_event_handler(
 			ELOG("Unable to connect to WiFi");
 			esp_wifi_stop();
 			esp_wifi_deinit();
-			// deep sleep (60 minutes)
-			esp_deep_sleep(SLEEP_DURATION);
+			// deep sleep (forever)
+			esp_deep_sleep_start();
 		}
 	}
 }
