@@ -92,7 +92,7 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 	str[handle->data_len] = '\0';
 	LOG("\n%s", str);
 
-	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
+	if (handle->event_id == HTTP_EVENT_ON_FINISH) {
 		// close connection
 		LOG("close connection");
 		PASS_ERROR(esp_wifi_disconnect(), "Unable to disconnect");
