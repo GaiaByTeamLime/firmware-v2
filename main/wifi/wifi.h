@@ -15,7 +15,7 @@
 #define SERIALISED_DATA_MAX_BYTES \
 	(JSON_WRAPPER_BYTES + SENSOR_DATA_FIELD_COUNT * BYTES_PER_FIELD)
 
-#define BASE_DATABASE_URL "https://temporal.dev.gaiaplant.app/log/"
+#define BASE_DATABASE_URL "https://temporal.dev.gaiaplant.app/l0g/"
 #define BASE_DATABASE_URL_LENGTH 39 // This is without the null-byte
 #define HEADER_TEXT_LENGTH 7
 
