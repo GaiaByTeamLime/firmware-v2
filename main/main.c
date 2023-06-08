@@ -127,6 +127,8 @@ esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
 		persistent_storage_init(), "Could not initialize persistent storage"
 	);
 
+	PASS_ERROR(sensors_init(), "Could not initialize Sensors.");
+
 	PASS_ERROR(spi2_init(), "Could not initialize SPI2 Host");
 	PASS_ERROR(rfid_init(rfid_spi_handle), "Could not add RFID to SPI Host");
 
