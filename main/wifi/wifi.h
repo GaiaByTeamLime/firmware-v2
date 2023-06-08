@@ -49,7 +49,7 @@ esp_err_t wifi_send_data_to_server(uint32_t* sensor_values);
  * @param data The configuration data used to connect to the server
  * @return Any error the WiFi driver may have encountered
  */
-esp_err_t wifi_start(connection_data_t* data);
+esp_err_t wifi_start(connection_data_t data);
 
 /**
  * Serialise sensor data into a compact JSON data format

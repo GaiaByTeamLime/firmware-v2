@@ -21,7 +21,7 @@ bool is_connected = false;
 
 void (*wifi_connected_callback)(void);
 
-connection_data_t* connection_data;
+connection_data_t connection_data;
 
 /**
  * Ugly function, only here to satisfy the function signiture of FreeRTOS
@@ -88,6 +88,7 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 
 	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
 		// close connection
+		LOG("close connection");
 		esp_wifi_disconnect();
 	}
 	return ESP_OK;
@@ -118,13 +119,13 @@ esp_err_t wifi_send_data_to_server(uint32_t* sensor_values) {
 	char url[BASE_DATABASE_URL_LENGTH + PICC_SID_LENGTH + 1] = {0};
 	char* url_cursor = url;
 	strcpy_iterate(&url_cursor, BASE_DATABASE_URL);
-	strcpy_iterate(&url_cursor, connection_data->sid);
+	strcpy_iterate(&url_cursor, connection_data.sid);
 	LOG("Generated valid URL");
 
 	char auth_header[HEADER_TEXT_LENGTH + PICC_TOKEN_LENGTH + 1] = {0};
 	char* auth_cursor = auth_header;
 	strcpy_iterate(&auth_cursor, "Bearer ");
-	strcpy_iterate(&auth_cursor, connection_data->token);
+	strcpy_iterate(&auth_cursor, connection_data.token);
 	LOG("Generated bearer token");
 
 	esp_http_client_config_t config = {
@@ -159,10 +160,10 @@ esp_err_t wifi_send_data_to_server(uint32_t* sensor_values) {
 	return esp_http_client_perform(client);
 }
 
-esp_err_t wifi_start(connection_data_t* data) {
+esp_err_t wifi_start(connection_data_t data) {
 	connection_data = data;
-	char* ssid = data->ssid;
-	char* password = data->password;
+	char* ssid = data.ssid;
+	char* password = data.password;
 	// Create a config struct
 	wifi_config_t wifi_config = {
 		.sta = {
