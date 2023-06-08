@@ -184,5 +184,5 @@ void app_main(void) {
 	};
 
 	// connect wifi
-	wifi_start(&connection_data);
+	wifi_start(connection_data);
 }
