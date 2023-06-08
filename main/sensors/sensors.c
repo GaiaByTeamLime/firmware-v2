@@ -16,8 +16,9 @@ static void interrupt_handler(void* args) {
 		soil_counter++;
 	}
 	timer_started = !timer_started;
-	if(soil_counter>=5){
-		gpio_uninstall_isr_service();
+	
+	// Only measure 5 times
+	if (soil_counter >= 5) {
 		gpio_isr_handler_remove(CAPACITY_SENSOR_PIN);
 	}
 }
@@ -28,7 +29,7 @@ esp_err_t capacity_sensor_init() {
 		"Could not set CAPACITY_SENSOR_POWER_PIN to mode output"
 	);
 	PASS_ERROR(
-		gpio_set_level(CAPACITY_SENSOR_POWER_PIN,1),
+		gpio_set_level(CAPACITY_SENSOR_POWER_PIN, 1),
 		"Could not set CAPACITY_SENSOR_PIN level to high. (1)"
 	);
 	PASS_ERROR(
