@@ -74,7 +74,13 @@ static void wifi_event_handler(
 		}
 	}
 	if (event_id == WIFI_EVENT_STA_START) {
-		esp_wifi_connect();
+		if (esp_wifi_connect() != ESP_OK) {
+			ELOG("Unable to connect to WiFi");
+			esp_wifi_stop();
+			esp_wifi_deinit();
+			// deep sleep (forever)
+			esp_deep_sleep_start();
+		}
 	}
 }
 
@@ -89,7 +95,7 @@ esp_err_t http_event_handle(esp_http_client_event_t* handle) {
 	if (handle->event_id == HTTP_EVENT_ON_HEADER) {
 		// close connection
 		LOG("close connection");
-		esp_wifi_disconnect();
+		PASS_ERROR(esp_wifi_disconnect(), "Unable to disconnect");
 	}
 	return ESP_OK;
 }
@@ -217,15 +223,25 @@ esp_err_t wifi_init(void (*success)(void)) {
 
 	// Register events
 	esp_event_handler_instance_t event_wifi_instance, event_ip_instance;
-	esp_event_handler_instance_register(
-		WIFI_EVENT,
-		ESP_EVENT_ANY_ID,
-		&wifi_event_handler,
-		NULL,
-		&event_wifi_instance
+	PASS_ERROR(
+		esp_event_handler_instance_register(
+			WIFI_EVENT,
+			ESP_EVENT_ANY_ID,
+			&wifi_event_handler,
+			NULL,
+			&event_wifi_instance
+		),
+		"Failed to register WiFi event handler"
 	);
-	esp_event_handler_instance_register(
-		IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, NULL, &event_ip_instance
+	PASS_ERROR(
+		esp_event_handler_instance_register(
+			IP_EVENT,
+			ESP_EVENT_ANY_ID,
+			&ip_event_handler,
+			NULL,
+			&event_ip_instance
+		),
+		"Failed to register IP event handler"
 	);
 
 	return ESP_OK;

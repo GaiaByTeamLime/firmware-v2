@@ -110,7 +110,10 @@ void on_wifi_connect(void) {
 	// add version number
 	sensor_data[0] = 2;
 
-	measure_sensors(&sensor_data[1]);
+	if (measure_sensors(&sensor_data[1]) != ESP_OK) {
+		LOG("Could not measure sensors, going to deep sleep (60 min)");
+		esp_deep_sleep(SLEEP_DURATION);
+	}
 
 	LOG("Version: %" PRId32, sensor_data[0]);
 	LOG("Soil: %" PRIu32, sensor_data[1]);
@@ -118,7 +121,10 @@ void on_wifi_connect(void) {
 	LOG("Batt: %" PRIu32, sensor_data[3]);
 
 	// send data over wifi
-	wifi_send_data_to_server(sensor_data);
+	if (wifi_send_data_to_server(sensor_data) != ESP_OK) {
+		LOG("Could not send data to the server, going to deep sleep (60 min)");
+		esp_deep_sleep(SLEEP_DURATION);
+	}
 }
 
 esp_err_t setup(spi_device_handle_t* rfid_spi_handle) {
@@ -169,7 +175,11 @@ esp_err_t get_and_store_credentials(
 void app_main(void) {
 	// setup
 	spi_device_handle_t rfid_handle = {0};
-	setup(&rfid_handle);
+	if (setup(&rfid_handle) != ESP_OK) {
+		LOG("Setup failed");
+		// deep sleep (forever)
+		esp_deep_sleep_start();
+	}
 
 	// get wifi credentials
 	connection_data_t connection_data;
@@ -184,5 +194,8 @@ void app_main(void) {
 	};
 
 	// connect wifi
-	wifi_start(connection_data);
+	if (wifi_start(connection_data) != ESP_OK) {
+		// deep sleep (forever)
+		esp_deep_sleep_start();
+	};
 }

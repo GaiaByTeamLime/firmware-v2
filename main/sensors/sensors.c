@@ -68,7 +68,10 @@ esp_err_t battery_measurement_init() {
 }
 
 esp_err_t sensors_init() {
-	gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT);
+	PASS_ERROR(
+		gpio_set_direction(GPIO_NUM_0, GPIO_MODE_OUTPUT),
+		"Could not set GPIO_NUM_0 to output"
+	);
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
 	PASS_ERROR(
 		battery_measurement_init(), "Could not init battery measurement sensor."
@@ -82,8 +85,12 @@ esp_err_t measure_sensors(uint32_t* data) {
 
 	data[0] = soil_capacity_data;
 
-	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
-	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
+	PASS_ERROR(
+		get_adc_data(ADC1_LDR, &data[1]), "failed to get LDR data"
+	); // ADC1 LDR sensor input.
+	PASS_ERROR(
+		get_adc_data(ADC1_BAT, &data[2]), "failed to get battery data"
+	); // ADC1 Battery sensor input.
 
 	return ESP_OK;
 }

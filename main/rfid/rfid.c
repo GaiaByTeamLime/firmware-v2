@@ -276,7 +276,10 @@ esp_err_t rfid_calculate_crc(
 	// getting the 2nd element in that array We do the same for the result, we
 	// take the base address, then add +0 or 1 and we get the destination
 	// pointer
-	rfid_read_registers(handle, registers + 1, result, 2);
+	PASS_ERROR(
+		rfid_read_registers(handle, registers + 1, result, 2),
+		"Unable to read RFID result"
+	);
 	return ESP_OK;
 }
 
