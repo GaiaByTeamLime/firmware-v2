@@ -50,9 +50,15 @@ esp_err_t sensors_init() {
 esp_err_t measure_sensors(uint32_t* data) {
 	pull_latest_data(); // Run through ADC conversion system.
 
-	PASS_ERROR(get_adc_data(ADC1_CAP, &data[0]), "Could not get ADC1_CAP data."); // ADC1 Soil capacitor input.
-	PASS_ERROR(get_adc_data(ADC1_LDR, &data[1]), "Could not get ADC1_LDR data."); // ADC1 LDR sensor input.
-	PASS_ERROR(get_adc_data(ADC1_BAT, &data[2]), "Could not get ADC1_BAT data."); // ADC1 Battery sensor input.
+	PASS_ERROR(
+		get_adc_data(ADC1_CAP, &data[0]), "Could not get ADC1_CAP data."
+	); // ADC1 Soil capacitor input.
+	PASS_ERROR(
+		get_adc_data(ADC1_LDR, &data[1]), "Could not get ADC1_LDR data."
+	); // ADC1 LDR sensor input.
+	PASS_ERROR(
+		get_adc_data(ADC1_BAT, &data[2]), "Could not get ADC1_BAT data."
+	); // ADC1 Battery sensor input.
 
 	return ESP_OK;
 }
