@@ -13,6 +13,10 @@
 
 /**
  * Initialize all sensors.
+ * Currently:
+ * Capacity Sensor
+ * Battery Sensor
+ * LDR Sensor
  *
  * @return Potential errors.
  */
