@@ -8,11 +8,8 @@
 #include <esp_err.h>
 
 #define CAPACITY_SENSOR_PIN 1
-#define CAPACITY_SENSOR_POWER_PIN 0
 #define BATTERY_MEASUREMENT_PIN 4
 #define CAPACITY_SENSOR_GPTIMER_RESOLUTION_HZ 40000000
-
-#define SOIL_SENSOR_MEASUREMENT_COUNT 20
 
 /**
  * Initialize all sensors.
