@@ -17,6 +17,7 @@ adc_data_t adc_result[ADC1_PORTS] = {0};
 adc1_port_t adc1_ports[ADC1_PORTS] = {
 	ADC_CHANNEL_3,
 	ADC_CHANNEL_4,
+	ADC_CHANNEL_1,
 };
 
 esp_err_t adc_init(void) {

@@ -10,7 +10,7 @@
  * to change this define
  *
  */
-#define ADC1_PORTS 2
+#define ADC1_PORTS 3
 
 /**
  * Enum to select the corresponding adc port
@@ -24,6 +24,7 @@
 typedef enum {
 	ADC1_LDR = 0, /*!< Is connected to PORT 3 from the esp32. */
 	ADC1_BAT = 1, /*!< Is connected to PORT 4 from the esp32. */
+	ADC1_CAP = 2, /*!< Is connected to PORT 1 from the esp32. */
 } adc1_port_t;
 
 /**

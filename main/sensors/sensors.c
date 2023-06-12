@@ -23,7 +23,7 @@ static void interrupt_handler(void* args) {
 	}
 }
 
-esp_err_t capacity_sensor_init() {
+esp_err_t capacity_sensor_init2() {
 	PASS_ERROR(
 		gpio_set_direction(CAPACITY_SENSOR_POWER_PIN, GPIO_MODE_OUTPUT),
 		"Could not set CAPACITY_SENSOR_POWER_PIN to mode output"
@@ -74,6 +74,19 @@ esp_err_t capacity_sensor_init() {
 	return ESP_OK;
 }
 
+esp_err_t capacity_sensor_init() {
+	PASS_ERROR(
+		gpio_set_direction(CAPACITY_SENSOR_PIN, GPIO_MODE_INPUT),
+		"Could not set the capacity pin to input."
+	);
+	PASS_ERROR(
+		gpio_pulldown_dis(CAPACITY_SENSOR_PIN),
+		"Could not disable pulldown on capacity pin."
+	)
+
+	return ESP_OK;
+}
+
 esp_err_t battery_measurement_init() {
 	PASS_ERROR(
 		gpio_set_direction(BATTERY_MEASUREMENT_PIN, GPIO_MODE_INPUT),
@@ -100,8 +113,7 @@ esp_err_t sensors_init() {
 esp_err_t measure_sensors(uint32_t* data) {
 	pull_latest_data(); // Run through ADC conversion system.
 
-	data[0] = soil_capacity_data;
-
+	get_adc_data(ADC1_CAP, &data[0]); // ADC1 Soil capacitor input.
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
 
