@@ -4,14 +4,25 @@
 esp_err_t capacity_sensor_init() {
 	PASS_ERROR(
 		gpio_set_direction(CAPACITY_SENSOR_PIN, GPIO_MODE_INPUT),
-		"Could not set the capacity pin to input."
+		"Could not set the CAPACITY_SENSOR_PIN to input."
 	);
 	PASS_ERROR(
 		gpio_pulldown_dis(CAPACITY_SENSOR_PIN),
-		"Could not disable pulldown on capacity pin."
-	)
+		"Could not disable pulldown on CAPACITY_SENSOR_PIN"
+	);
 
 	return ESP_OK;
+}
+
+esp_err_t ldr_sensor_init() {
+	PASS_ERROR(
+		gpio_set_direction(LDR_MEASUREMENT_PIN, GPIO_MODE_INPUT),
+		"Could not set BATTERY_MEASUREMENT_PIN to input."
+	);
+	PASS_ERROR(
+		gpio_pulldown_dis(LDR_MEASUREMENT_PIN),
+		"Could not disable pulldown on LDR_MEASUREMENT_PIN"
+	)
 }
 
 esp_err_t battery_measurement_init() {
@@ -23,7 +34,6 @@ esp_err_t battery_measurement_init() {
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
 		"Could not disable internal pulldown resistor."
 	);
-
 	return ESP_OK;
 }
 
