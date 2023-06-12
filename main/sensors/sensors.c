@@ -32,14 +32,16 @@ esp_err_t battery_measurement_init() {
 	);
 	PASS_ERROR(
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
-		"Could not disable internal pulldown resistor."
+		"Could not disable BATTERY_MEASUREMENT_PIN pulldown resistor."
 	);
 	return ESP_OK;
 }
 
 esp_err_t sensors_init() {
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
-	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
+	PASS_ERROR(
+		battery_measurement_init(), "Could not init battery measurement sensor."
+	);
 	PASS_ERROR(ldr_sensor_init(), "Could not init ldr sensor.");
 
 	return ESP_OK;
