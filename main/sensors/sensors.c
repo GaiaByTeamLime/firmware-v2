@@ -41,7 +41,6 @@ esp_err_t measure_sensors(uint32_t* data) {
 	get_adc_data(ADC1_CAP, &data[0]); // ADC1 Soil capacitor input.
 	get_adc_data(ADC1_LDR, &data[1]); // ADC1 LDR sensor input.
 	get_adc_data(ADC1_BAT, &data[2]); // ADC1 Battery sensor input.
-
-	gpio_uninstall_isr_service();
+	
 	return ESP_OK;
 }
