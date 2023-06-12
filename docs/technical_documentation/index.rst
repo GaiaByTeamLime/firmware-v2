@@ -13,7 +13,7 @@ In text form, the following pins are used:
 === ========== ===========
 Pin Function   Description
 === ========== ===========
-1   DIGITAL IN |pin01|
+1   ADC IN     |pin01|
 --- ---------- -----------
 2   SPI MISO   |pin02|
 --- ---------- -----------
@@ -28,7 +28,7 @@ Pin Function   Description
 10  SPI CS0    |pin10|
 === ========== ===========
 
-.. |pin01| replace:: Connected to the soil capacity sensor, we measure the time between highs to determine a value, therefore it's a digital pin.
+.. |pin01| replace:: Connected to the soil capacity sensor, which delivers a analog voltage as result.
 .. |pin02| replace:: The SPI Master-In-Slave-Out pin, used to communicate to the RFID reader.
 .. |pin03| replace:: Connect to an LDR, reads an analogue value.
 .. |pin04| replace:: Connected to the battery, this pin is used to measure the battery capacity of the device.
