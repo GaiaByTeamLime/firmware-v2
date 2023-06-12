@@ -17,7 +17,7 @@ esp_err_t capacity_sensor_init() {
 esp_err_t ldr_sensor_init() {
 	PASS_ERROR(
 		gpio_set_direction(LDR_MEASUREMENT_PIN, GPIO_MODE_INPUT),
-		"Could not set BATTERY_MEASUREMENT_PIN to input."
+		"Could not set LDR_MEASUREMENT_PIN to input."
 	);
 	PASS_ERROR(
 		gpio_pulldown_dis(LDR_MEASUREMENT_PIN),
