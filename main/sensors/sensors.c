@@ -28,7 +28,7 @@ esp_err_t ldr_sensor_init() {
 esp_err_t battery_measurement_init() {
 	PASS_ERROR(
 		gpio_set_direction(BATTERY_MEASUREMENT_PIN, GPIO_MODE_INPUT),
-		"Could not do the funny to Input"
+		"Could not set BATTERY_MEASUREMENT_PIN to input."
 	);
 	PASS_ERROR(
 		gpio_pulldown_dis(BATTERY_MEASUREMENT_PIN),
@@ -40,6 +40,7 @@ esp_err_t battery_measurement_init() {
 esp_err_t sensors_init() {
 	PASS_ERROR(capacity_sensor_init(), "Could not init capacity sensor");
 	PASS_ERROR(battery_measurement_init(), "Could not init battery measurement sensor.");
+	PASS_ERROR(ldr_sensor_init(), "Could not init ldr sensor.");
 
 	return ESP_OK;
 }
