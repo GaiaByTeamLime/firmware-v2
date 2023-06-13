@@ -10,10 +10,13 @@
 #define CAPACITY_SENSOR_PIN 1
 #define BATTERY_MEASUREMENT_PIN 4
 #define LDR_MEASUREMENT_PIN 3
-#define CAPACITY_SENSOR_GPTIMER_RESOLUTION_HZ 40000000
 
 /**
  * Initialize all sensors.
+ * Currently:
+ * Capacity Sensor
+ * Battery Sensor
+ * LDR Sensor
  *
  * @return Potential errors.
  */
