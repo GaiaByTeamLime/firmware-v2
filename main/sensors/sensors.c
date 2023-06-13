@@ -22,7 +22,8 @@ esp_err_t ldr_sensor_init() {
 	PASS_ERROR(
 		gpio_pulldown_dis(LDR_MEASUREMENT_PIN),
 		"Could not disable pulldown on LDR_MEASUREMENT_PIN"
-	)
+	);
+	return ESP_OK;
 }
 
 esp_err_t battery_measurement_init() {

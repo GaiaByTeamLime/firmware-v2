@@ -311,9 +311,14 @@ esp_err_t rfid_wakeup_mifare_tag(spi_device_handle_t* handle) {
 	const uint8_t valid_bits = 7;
 
 	// Make sure the device is in READY mode
+	uint8_t attempts_left = 20;
 	while (rfid_transceive(handle, command, 1, buffer, 2, valid_bits) != ESP_OK
 	) {
 		LOG("Unable to wake up reader, trying again");
+		// if (!(attempts_left--)) {
+		// 	ELOG("Attempted 20 times, failed.");
+		// 	return ESP_ERR_TIMEOUT;
+		// }
 	}
 
 	// Make a read at address 0x00, this will make the MiFare tag skip the
