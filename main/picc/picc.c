@@ -26,11 +26,11 @@ void picc_get_password(tag_data_t* tag, char* password) {
 	picc_parse(cursor, password, PICC_PASS_LENGTH);
 }
 
-void picc_get_sid(tag_data_t* tag, char* url) {
+void picc_get_sid(tag_data_t* tag, char* sid) {
 	uint8_t* cursor = tag->raw_data;
 	cursor += SKIP_BYTES + TLV_PREAMBLE + NDEF_TYPE_LENGTH + PAYLOAD_PREAMBLE +
 			  PICC_SSID_LENGTH + PICC_PASS_LENGTH;
-	picc_parse(cursor, url, SENSOR_ID_LENGTH);
+	picc_parse(cursor, sid, SENSOR_ID_LENGTH);
 }
 
 void picc_get_token(tag_data_t* tag, char* token) {
