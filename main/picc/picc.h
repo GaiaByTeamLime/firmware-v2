@@ -38,6 +38,7 @@
  * `PICC_SSID_LENGTH + 1`
  */
 void picc_get_ssid(tag_data_t* tag, char* ssid);
+
 /**
  * Extract the password from the tag.
  *
@@ -46,14 +47,16 @@ void picc_get_ssid(tag_data_t* tag, char* ssid);
  * least `PICC_PASS_LENGTH + 1`
  */
 void picc_get_password(tag_data_t* tag, char* password);
+
 /**
- * Extract the url from the tag.
+ * Extract the sensor ID from the tag.
  *
  * @param tag The tag to extract the data from
  * @param url The string to store the url on, the length must be at least
  * `PICC_SID_LENGTH + 1`
  */
-void picc_get_sid(tag_data_t* tag, char* url);
+void picc_get_sid(tag_data_t* tag, char* sid);
+
 /**
  * Extract the token from an tag.
  *
