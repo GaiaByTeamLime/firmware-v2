@@ -78,6 +78,7 @@ static void wifi_event_handler(
 			ELOG("Unable to connect to WiFi");
 			esp_wifi_stop();
 			esp_wifi_deinit();
+			persistent_storage_erase();
 			// deep sleep (forever)
 			esp_deep_sleep_start();
 		}
